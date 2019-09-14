@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <View
+            android:id="@+id/view_top_place_list"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/view_bottom_palce_list"
+    />
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="#ffffff"
+            android:lineSpacingExtra="9sp"
+            android:text="강의실"
+            android:includeFontPadding="false"
+            android:fontFamily="@font/notosanskrbold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/view_top_place_list"
+            app:layout_constraintBottom_toBottomOf="@id/view_top_place_list"
+    />
+
+    <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/back"
+            android:layout_marginStart="15dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/view_top_place_list"
+            app:layout_constraintBottom_toBottomOf="@+id/view_top_place_list"
+    />
+
+    <View
+            android:id="@+id/view_bottom_palce_list"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@+id/view_top_place_list"
+    />
+
+    <TextView
+            android:id="@+id/tv_center_place_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#7b7b7b"
+            android:lineSpacingExtra="7sp"
+            android:text="다음 분류를 선택해주세요 :)"
+            app:layout_constraintTop_toBottomOf="@+id/view_bottom_palce_list"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="195dp"
+    />
+
+    <ImageView
+        android:layout_width="171dp"
+        android:layout_height="79dp"
+        android:src="@drawable/palcon"
+        app:layout_constraintTop_toBottomOf="@+id/tv_center_place_list"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="10dp"
+    />
+
+</android.support.constraint.ConstraintLayout>
