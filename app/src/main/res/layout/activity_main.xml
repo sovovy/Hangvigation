@@ -13,7 +13,7 @@
         android:layout_height="50dp"
         android:background="@color/colorPrimary"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/view_bottom_main"
+        app:layout_constraintBottom_toTopOf="@+id/cl_second_main"
     />
 
     <TextView
@@ -52,23 +52,290 @@
         app:layout_constraintEnd_toEndOf="parent"
     />
 
-    <View
-            android:id="@+id/view_bottom_main"
-            android:layout_width="match_parent"
-            android:layout_height="46dp"
-            android:background="@color/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@+id/view_top_main"
-    />
 
-    <Button
-        android:id="@+id/button_first_main"
-        android:layout_width="64dp"
-        android:layout_height="30dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_top_main"
-        app:layout_constraintBottom_toBottomOf="@+id/view_bottom_main"
-        android:layout_marginStart="15dp"
-        app:layout_constraintCircleRadius="18dp"
-    />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/cl_second_main"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@+id/view_top_main">
+
+        <Button
+            android:id="@+id/bt_first_main"
+            android:layout_width="64dp"
+            android:layout_height="30dp"
+            android:background="@drawable/round_square_yellow"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:lineSpacingExtra="8sp"
+            android:text="강의실"
+            android:fontFamily="@font/notosanskrmedium"
+            android:includeFontPadding="false"
+            app:layout_constraintStart_toStartOf="@id/cl_second_main"
+            app:layout_constraintEnd_toStartOf="@+id/bt_second_main"
+            app:layout_constraintTop_toTopOf="@id/cl_second_main"
+            app:layout_constraintBottom_toBottomOf="@id/cl_second_main"
+        />
+
+        <Button
+            android:id="@+id/bt_second_main"
+            android:layout_width="78dp"
+            android:layout_height="30dp"
+            android:background="@drawable/round_square_yellow"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:lineSpacingExtra="8sp"
+            android:text="편의시설"
+            android:fontFamily="@font/notosanskrmedium"
+            android:includeFontPadding="false"
+            app:layout_constraintStart_toEndOf="@id/bt_first_main"
+            app:layout_constraintEnd_toStartOf="@+id/bt_third_main"
+            app:layout_constraintTop_toTopOf="@+id/cl_second_main"
+            app:layout_constraintBottom_toBottomOf="@+id/cl_second_main"
+        />
+
+        <Button
+            android:id="@+id/bt_third_main"
+            android:layout_width="104dp"
+            android:layout_height="30dp"
+            android:background="@drawable/round_square_yellow"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:lineSpacingExtra="8sp"
+            android:text="연구∙사무실"
+            android:fontFamily="@font/notosanskrmedium"
+            android:includeFontPadding="false"
+            app:layout_constraintStart_toEndOf="@id/bt_second_main"
+            app:layout_constraintEnd_toStartOf="@+id/bt_fourth_main"
+            app:layout_constraintTop_toTopOf="@+id/cl_second_main"
+            app:layout_constraintBottom_toBottomOf="@+id/cl_second_main"
+        />
+
+        <Button
+            android:id="@+id/bt_fourth_main"
+            android:layout_width="54dp"
+            android:layout_height="30dp"
+            android:background="@drawable/round_square_yellow"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:lineSpacingExtra="8sp"
+            android:text="그 외"
+            android:fontFamily="@font/notosanskrmedium"
+            android:includeFontPadding="false"
+            app:layout_constraintStart_toEndOf="@id/bt_third_main"
+            app:layout_constraintTop_toTopOf="@+id/cl_second_main"
+            app:layout_constraintBottom_toBottomOf="@+id/cl_second_main"
+            app:layout_constraintEnd_toEndOf="@+id/cl_second_main"
+        />
+    </android.support.constraint.ConstraintLayout>
+
+
+    <android.support.constraint.ConstraintLayout
+            android:id="@+id/cl_search_main"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+    >
+
+        <View
+                android:id="@+id/view_top_search"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/colorPrimary"
+                app:layout_constraintTop_toTopOf="parent"
+        />
+
+        <EditText
+                android:id="@+id/et_bar_search"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                app:layout_constraintTop_toTopOf="@+id/view_top_search"
+                app:layout_constraintBottom_toBottomOf="@+id/view_top_search"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/iv_cancel_search"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/round_square_yellow"
+                android:backgroundTint="#ffffff"
+        />
+
+        <ImageView
+                android:id="@+id/iv_cancel_search"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/cancel"
+                app:layout_constraintStart_toEndOf="@+id/et_bar_search"
+                android:layout_marginStart="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintTop_toTopOf="@+id/view_top_search"
+                app:layout_constraintBottom_toBottomOf="@+id/view_top_search"
+        />
+
+        <TextView
+                android:id="@+id/tv_bar_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="#9a9a9a"
+                android:lineSpacingExtra="7sp"
+                android:text="장소를 검색해보세요"
+                app:layout_constraintTop_toTopOf="@+id/et_bar_search"
+                app:layout_constraintBottom_toBottomOf="@+id/et_bar_search"
+                app:layout_constraintStart_toStartOf="@+id/et_bar_search"
+                android:layout_marginStart="17dp"
+        />
+
+        <View
+                android:id="@+id/view_bottom_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/view_top_search"
+                android:background="#cb000000"
+        />
+
+        <TextView
+                android:id="@+id/tv_recent_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="9sp"
+                android:text="최근 검색"
+                app:layout_constraintTop_toTopOf="@+id/view_bottom_search"
+                android:layout_marginTop="22dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="16dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_recent1_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:text="소프트웨어학과"
+                app:layout_constraintTop_toBottomOf="@+id/tv_recent_search"
+                android:layout_marginTop="19dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_recent2_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:text="소프트웨어학과"
+                app:layout_constraintTop_toBottomOf="@+id/tv_recent1_search"
+                android:layout_marginTop="25dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_recent3_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:text="소프트웨어학과"
+                app:layout_constraintTop_toBottomOf="@+id/tv_recent2_search"
+                android:layout_marginTop="25dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_recent4_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:text="소프트웨어학과"
+                app:layout_constraintTop_toBottomOf="@+id/tv_recent3_search"
+                android:layout_marginTop="25dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+
+
+        <TextView
+                android:id="@+id/tv_hot_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="9sp"
+                android:text="추천 검색 / Hot 검색어"
+                app:layout_constraintTop_toBottomOf="@+id/tv_recent4_search"
+                android:layout_marginTop="42dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="16dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_hot1_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:text="소프트웨어학과"
+                app:layout_constraintTop_toBottomOf="@+id/tv_hot_search"
+                android:layout_marginTop="19dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_hot2_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:text="소프트웨어학과"
+                app:layout_constraintTop_toBottomOf="@+id/tv_hot1_search"
+                android:layout_marginTop="25dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_hot3_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:text="소프트웨어학과"
+                app:layout_constraintTop_toBottomOf="@+id/tv_hot2_search"
+                android:layout_marginTop="25dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_hot4_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:text="소프트웨어학과"
+                app:layout_constraintTop_toBottomOf="@+id/tv_hot3_search"
+                android:layout_marginTop="25dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>
