@@ -11,6 +11,8 @@ import android.view.SurfaceView
 class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), SurfaceHolder.Callback {
     private val mHolder: SurfaceHolder = holder
     private var mThread: DrawThread
+    var x: Float? = null
+    var y: Float? = null
 
     init {
         holder.addCallback(this)
@@ -104,7 +106,9 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
                         it.style = Paint.Style.FILL
                         it.color = Color.RED
                         // y는 반대여서 105에서 좌표값을 빼줘야댐
-                        canvas.drawCircle(innerMapView.coordToDp(17), innerMapView.coordToDp(105-72), 50f, it)
+                        innerMapView.x = innerMapView.coordToDp(17)
+                        innerMapView.y = innerMapView.coordToDp(105-72)
+                        canvas.drawCircle(innerMapView.x!!, innerMapView.y!!, 50f, it)
                     }
                     //ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
