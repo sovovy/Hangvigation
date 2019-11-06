@@ -28,6 +28,7 @@ class IndoorMapActivity : AppCompatActivity() {
     private var wifiManager: WifiManager? = null
     private lateinit var scanResult: List<ScanResult>
     private var permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+    lateinit var mapView : InnerMapView
     val x:Float = 0F
     val y:Float = 0F
 
@@ -67,6 +68,8 @@ class IndoorMapActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_indoor_map)
 
+        wifiManager = this.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
+
         if (wifiManager != null) {
             if (!wifiManager!!.isWifiEnabled) {
                 wifiManager!!.isWifiEnabled = true
@@ -77,8 +80,7 @@ class IndoorMapActivity : AppCompatActivity() {
             wifiManager!!.startScan()
         }
 
-        wifiManager = this.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
-
+//        mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3))
         prt.addView(InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3)))
 
         // 네트워크
@@ -95,20 +97,22 @@ class IndoorMapActivity : AppCompatActivity() {
 
     /* 통신 */
     private fun network(rssi: ArrayList<PostCoordData>){
-        val postCoord = networkService.postCoord(arrayListOf(
-            PostCoordData("06:09:b4:76:cc:d4", (-62).toDouble()),
-            PostCoordData("0a:09:b4:76:cc:94", (-59).toDouble())
-        )
-        )
+        val postCoord = networkService.postCoord(rssi)
 
         postCoord.enqueue(object : Callback<PostCoordResponse> {
             override fun onFailure(call: Call<PostCoordResponse>?, t: Throwable?) {
+                Log.d("ASDFF", "${t.toString()}")
 
             }
 
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
                 if(response!!.isSuccessful){
-                    Log.d("ASDF", "${response.body().data.x}, ${response.body().data.y}")
+                    Log.d("ASDFF", "${response.body().data.x}, ${response.body().data.y}")
+//                    mapView.x = response.body().data.x
+//                    mapView.y = response.body().data.y
+//                    mapView.mThread.run()
+                } else{
+                    Log.d("ASDFF", "${response.message()}")
                 }
             }
         })
@@ -140,8 +144,7 @@ class IndoorMapActivity : AppCompatActivity() {
         accessPointsStack = ArrayList(accessPointsStack.sortedWith(compareBy { it.cnt }).reversed())
         var postRssiData = ArrayList<PostCoordData>()
 
-        Log.d("ASDF", accessPointsStack.toString())
-        if (accessPointsStack[0].cnt > 5) {
+        if (accessPointsStack[0].cnt > 20) {
             accessPointsStack.forEach {
                 postRssiData.add(PostCoordData(it.bssid, it.rssi))
             }
