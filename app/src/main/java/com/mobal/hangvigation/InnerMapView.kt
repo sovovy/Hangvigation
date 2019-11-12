@@ -8,17 +8,16 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import retrofit2.Response
 
-
-class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), SurfaceHolder.Callback {
+class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), SurfaceHolder.Callback, Runnable {
     private val mHolder: SurfaceHolder = holder
-    private var mThread: DrawThread
+    private var thread: Thread? = null
     var x: Int
     var y: Int
     val response: Response<PostCoordResponse>? = null
 
     init {
         holder.addCallback(this)
-        mThread = DrawThread(mHolder, this)
+//        mThread = DrawThread(mHolder, this)
         x = 0
         y = 0
     }
@@ -70,25 +69,61 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
 
     /* SurfaceView */
     override fun surfaceCreated(holder: SurfaceHolder?) {
-        mThread = DrawThread(mHolder, this)
-        mThread.start()
+        thread = Thread(this)
+        thread!!.start()
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-        var retry = true
-        while (retry) {
-            try {
-                mThread.join() // Thread 종료 기다리기
-                break
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            retry = false
+        try {
+            thread!!.interrupt()
+        } catch (e: Exception) {
+            Log.e(this.javaClass.name, e.message)
         }
     }
 
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+    }
 
+    override fun run() {
+        while(!Thread.currentThread().isInterrupted) {
+            var canvas: Canvas? = null
+            try {
+                canvas = mHolder.lockCanvas()
+                synchronized(mHolder) {
+                    doDraw(canvas)
+                    Thread.sleep(50)
+                }
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            } finally {
+                if(canvas != null)
+                    mHolder.unlockCanvasAndPost(canvas)
+            }
+        }
+    }
+
+    private fun doDraw(c: Canvas) {
+        // draw map
+        val dst = Rect(0, 0, img.width , img.height)
+        c.drawBitmap(img, null, dst, null)
+
+        Paint().also {
+            it.style = Paint.Style.FILL
+            it.color = Color.RED
+
+            try {
+                if (response!!.isSuccessful) {
+                    x = coordToDp(response.body().data.x)
+                    y = coordToDp(105 - response.body().data.y)
+                    Log.d("asd", "x:$x, y:$y")
+                    c.drawCircle(x.toFloat(), y.toFloat(), 50f, it)
+                } else {
+                    Log.d("asdasd", "${response.message()}")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     /* Thread */
