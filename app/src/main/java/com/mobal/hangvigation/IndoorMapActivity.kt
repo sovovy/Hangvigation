@@ -29,8 +29,6 @@ class IndoorMapActivity : AppCompatActivity() {
     private lateinit var scanResult: List<ScanResult>
     private var permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
     lateinit var mapView : InnerMapView
-    val x:Float = 0F
-    val y:Float = 0F
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -80,19 +78,12 @@ class IndoorMapActivity : AppCompatActivity() {
             wifiManager!!.startScan()
         }
 
-//        mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3))
+        mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3))
         prt.addView(InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3)))
 
         // 네트워크
         networkService = ApplicationController.instance.networkService
 
-        // 새로고침 버튼 클릭
-//        indoor_refresh_btn.setOnClickListener {
-//            val innerMapView: InnerMapView = prt
-//            innerMapView!!.x = x
-//            innerMapView!!.y = y
-//            innerMapView.invalidate() // 이 함수가 있어야 onDraw 호출
-//        }
     }
 
     /* 통신 */
@@ -108,9 +99,8 @@ class IndoorMapActivity : AppCompatActivity() {
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
                 if(response!!.isSuccessful){
                     Log.d("ASDFF", "${response.body().data.x}, ${response.body().data.y}")
-//                    mapView.x = response.body().data.x
-//                    mapView.y = response.body().data.y
-//                    mapView.mThread.run()
+                    mapView.x = response.body().data.x
+                    mapView.y = response.body().data.y
                 } else{
                     Log.d("ASDFF", "${response.message()}")
                 }

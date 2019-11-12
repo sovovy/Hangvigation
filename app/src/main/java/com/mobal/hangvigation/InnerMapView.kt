@@ -1,22 +1,30 @@
 package com.mobal.hangvigation
 
 import android.content.Context
-import android.view.View
 import android.graphics.*
 import android.util.Log
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import retrofit2.Response
 
 
 class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), SurfaceHolder.Callback {
     private val mHolder: SurfaceHolder = holder
     private var mThread: DrawThread
-    var x: Float? = null
-    var y: Float? = null
+    var x: Int
+    var y: Int
+    val response: Response<PostCoordResponse>? = null
 
     init {
         holder.addCallback(this)
         mThread = DrawThread(mHolder, this)
+        x = 0
+        y = 0
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return super.onTouchEvent(event)
     }
 
 //    override fun onDraw(canvas: Canvas) {
@@ -54,12 +62,13 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
     override fun onMeasure(wMS: Int, hMS: Int) {
         setMeasuredDimension(2511, 8505)
     }
-    private fun coordToDp(coord: Int) : Float {
+    private fun coordToDp(coord: Int) : Int {
         // 이미지 좌표 최대값 (31/105)
         // 캔버스 크기 (2511, 8505)
-        return coord*81f
+        return coord*81
     }
 
+    /* SurfaceView */
     override fun surfaceCreated(holder: SurfaceHolder?) {
         mThread = DrawThread(mHolder, this)
         mThread.start()
@@ -79,10 +88,10 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
     }
 
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-//        if(mThread != null)
 
     }
 
+    /* Thread */
     class DrawThread(val Holder: SurfaceHolder, val innerMapView: InnerMapView) : Thread() {
         var bExit: Boolean = false
         val mHolder: SurfaceHolder = Holder
@@ -94,23 +103,23 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
                 synchronized(mHolder){
                     canvas = mHolder.lockCanvas()
 
-
-                    // 여기에 onDraw()에 있던 내용이 들어가야댐ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                    /* onDraw()에 있던거 */
                     // draw map
                     val dst = Rect(0, 0, innerMapView.img.width , innerMapView.img.height)
-//                    Log.d("tag", innerMapView.img.width.toString() +" "+ innerMapView.img.height.toString())
                     canvas.drawBitmap(innerMapView.img, null, dst, null)
-
 
                     Paint().also {
                         it.style = Paint.Style.FILL
                         it.color = Color.RED
-                        // y는 반대여서 105에서 좌표값을 빼줘야댐
-                        innerMapView.x = innerMapView.coordToDp(17)
-                        innerMapView.y = innerMapView.coordToDp(105-72)
-                        canvas.drawCircle(innerMapView.x!!, innerMapView.y!!, 50f, it)
+
+                        if(innerMapView.response!!.isSuccessful) {
+                            innerMapView.x = innerMapView.coordToDp(innerMapView.response.body().data.x)
+                            innerMapView.y = innerMapView.coordToDp(105 - innerMapView.response.body().data.y)
+                            Log.d("asd", "x:"+innerMapView.x.toString() + ", y:"+innerMapView.y.toString())
+                            canvas.drawCircle(innerMapView.x.toFloat(), innerMapView.y.toFloat(), 50f, it)
+                        }
                     }
-                    //ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                    /* onDraw()에 있던거 */
 
                     mHolder.unlockCanvasAndPost(canvas)
                 }
@@ -120,9 +129,5 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
 }
 
 // TODO
-// 서버랑 통신
 // 서버에서 받은 현재 위치 값을 canvas 좌표에서 찾아 점 그리기
-
-// 라인 위에 점만 지울 방법 궁리 (현재 위치 변할때마다 점 위치도 변하게)
-// coordToDp 함수 생각 (좌표값->캔버스 좌표)
 // 맵 확대-축소 가능하게
