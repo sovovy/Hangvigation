@@ -14,7 +14,6 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
     private var thread: Thread? = null
     var x: Int
     var y: Int
-    private val response: Response<PostCoordResponse>? = null
     private val MIN_ZOOM: Float = 1f
     private val MAX_ZOOM: Float = 5f
     private var scaleFactor = 1f
@@ -32,6 +31,7 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
     private val detector: ScaleGestureDetector
     private val displayHeight: Int
     private val displayWidth: Int
+    var response: Response<PostCoordResponse>? = null
 
     init {
         holder.addCallback(this)
@@ -102,8 +102,8 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
 
             try {
                 if (response!!.isSuccessful) {
-                    x = coordToDp(response.body().data.x)
-                    y = coordToDp(105 - response.body().data.y)
+                    x = coordToDp(response!!.body().data.x)
+                    y = coordToDp(105 - response!!.body().data.y)
                     Log.d("asd", "x:$x, y:$y")
                     c.drawCircle(x.toFloat(), y.toFloat(), 50f, it)
                 }
@@ -127,38 +127,6 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
         c.translate(translateX / scaleFactor, translateY / scaleFactor)
         c.restore()
     }
-
-//    override fun onDraw(canvas: Canvas) {
-//        super.onDraw(canvas)
-//        setBackgroundColor(Color.WHITE)
-//
-//        // draw map
-////        val dst = Rect(0, 0, img.width , img.height)
-////        canvas.drawBitmap(img, null, dst, null)
-////
-////
-////        Paint().also {
-////            it.style = Paint.Style.FILL
-////            it.color = Color.RED
-////            canvas.drawCircle(coordToDp(10, 10), 0f, 50f, it)
-////        }
-//
-////        Line
-//
-////        val MyPaint = Paint()
-////        MyPaint.strokeWidth = 5f
-////        MyPaint.style = Paint.Style.STROKE
-////        MyPaint.color = Color.GRAY
-////
-////        val path = Path()
-////        path.moveTo(100f, 100f)
-////        path.lineTo(100f, 100f)
-////        path.lineTo(100f, 200f)
-////        path.lineTo(200f, 100f)
-////        path.lineTo(200f, 200f)
-////        path.lineTo(300f, 100f)
-////        canvas.drawPath(path, MyPaint)
-//    }
 
     override fun onMeasure(wMS: Int, hMS: Int) {
         setMeasuredDimension(2511, 8505)

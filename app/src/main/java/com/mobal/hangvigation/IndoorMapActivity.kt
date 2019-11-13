@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.activity_indoor_map.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.pow
 
 class IndoorMapActivity : AppCompatActivity() {
     private var accessPoints: ArrayList<AccessPoint> = ArrayList()
@@ -29,6 +30,10 @@ class IndoorMapActivity : AppCompatActivity() {
     private lateinit var scanResult: List<ScanResult>
     private var permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
     lateinit var mapView : InnerMapView
+    var sum1 = 0.0f
+    var cnt1 = 0
+    var sum2 = 0.0f
+    var cnt2 = 0
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -98,12 +103,29 @@ class IndoorMapActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
                 if(response!!.isSuccessful){
-                    Log.d("ASDFF", "${response.body().data.x}, ${response.body().data.y}")
+                    mapView.response = response
+                    val x = response.body().data.x
+                    val y = response.body().data.y
+                    // 예전 방식
+                    val x2 = response.body().data.x2
+                    val y2 = response.body().data.y2
+                    val x3 = 10
+                    val y3 = 17
+                    sum1 += getDistance(x, y, x3, y3)
+                    cnt1++
+                    sum2 += getDistance(x2, y2, x3, y3)
+                    cnt2++
+                    Log.d("ASDFF", "11111 ${response.body().data.x}, ${response.body().data.y} 오차 거리: ${sum1/cnt1}")
+                    Log.d("ASDFF", "22222 ${response.body().data.x2}, ${response.body().data.y2} 오차 거리: ${sum2/cnt2}")
                     mapView.x = response.body().data.x
                     mapView.y = response.body().data.y
                 } else{
                     Log.d("ASDFF", "${response.message()}")
                 }
+            }
+
+            private fun getDistance(x: Int, y: Int, i: Int, i1: Int): Float {
+                return ((x-i).toFloat().pow(2) + (y-i1).toFloat().pow(2)).pow(0.5f)
             }
         })
     }
