@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.Log
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import retrofit2.Response
@@ -13,17 +14,118 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
     private var thread: Thread? = null
     var x: Int
     var y: Int
-    val response: Response<PostCoordResponse>? = null
+    private val response: Response<PostCoordResponse>? = null
+    private val MIN_ZOOM: Float = 1f
+    private val MAX_ZOOM: Float = 5f
+    private var scaleFactor = 1f
+    private val NONE: Int = 0
+    private val DRAG: Int = 1
+    private val ZOOM: Int = 2
+    private var mode: Int = NONE
+    private var startX: Float = 0f
+    private var startY: Float = 0f
+    private var translateX: Float = 0f
+    private var translateY: Float = 0f
+    private var previousTranslateX: Float = 0f
+    private var previousTranslateY: Float = 0f
+    private var dragged: Boolean = false
+    private val detector: ScaleGestureDetector
+    private val displayHeight: Int
+    private val displayWidth: Int
 
     init {
         holder.addCallback(this)
-//        mThread = DrawThread(mHolder, this)
         x = 0
         y = 0
+        detector = ScaleGestureDetector(ctx, ScaleListener())
+        displayHeight = height
+        displayWidth = width
     }
-
+    // Zoom 출처: https://stackoverflow.com/questions/25757544/android-scale-zoom-zoomout-bitmap-on-canvas
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return super.onTouchEvent(event)
+        Log.d("asdasd", "ontouch")
+        when(MotionEvent.ACTION_MASK) {
+            MotionEvent.ACTION_DOWN -> {
+                mode = DRAG
+                Log.d("asdasd", "action down")
+                startX = event!!.x - previousTranslateX
+                startY = event!!.y - previousTranslateY
+            }
+            MotionEvent.ACTION_MOVE -> {
+                translateX = event!!.x - startX
+                translateY = event!!.y - startY
+                Log.d("asdasd", "action move")
+                val distance = Math.sqrt(
+                    Math.pow((event.x - (startX + previousTranslateX)).toDouble(), 2.0)
+                            + Math.pow((event.y - (startY + previousTranslateY)).toDouble(), 2.0)
+                )
+
+                if (distance > 0) {
+                    dragged = true
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                Log.d("asdasd", "action up")
+                mode = NONE
+                dragged = false
+                previousTranslateX = translateX
+                previousTranslateY = translateY
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+                Log.d("asdasd", "action pointer up")
+                mode = DRAG
+                previousTranslateX = translateX
+                previousTranslateY = translateY
+            }
+        }
+        detector.onTouchEvent(event)
+
+        if ((mode == DRAG && scaleFactor != 1f && dragged) || mode == ZOOM) {
+            invalidate()
+        }
+        return true
+//        return super.onTouchEvent(event)
+}
+
+    private fun doDraw(c: Canvas) {
+        c.save()
+        c.scale(scaleFactor, scaleFactor)
+
+
+        // draw map
+        val dst = Rect(0, 0, img.width , img.height)
+        c.drawBitmap(img, null, dst, null)
+
+        Paint().also {
+            it.style = Paint.Style.FILL
+            it.color = Color.RED
+
+            try {
+                if (response!!.isSuccessful) {
+                    x = coordToDp(response.body().data.x)
+                    y = coordToDp(105 - response.body().data.y)
+                    Log.d("asd", "x:$x, y:$y")
+                    c.drawCircle(x.toFloat(), y.toFloat(), 50f, it)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        if((translateX * -1) < 0) {
+            translateX = 0F
+        } else if((translateX * -1) > (scaleFactor - 1) * displayWidth) {
+            translateX = (1 - scaleFactor) * displayWidth
+        }
+
+        if(translateY * -1 < 0) {
+            translateY = 0F
+        } else if((translateY * -1) > (scaleFactor - 1) * displayHeight) {
+            translateY = (1 - scaleFactor) * displayHeight
+        }
+
+        c.translate(translateX / scaleFactor, translateY / scaleFactor)
+        c.restore()
     }
 
 //    override fun onDraw(canvas: Canvas) {
@@ -102,63 +204,11 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
         }
     }
 
-    private fun doDraw(c: Canvas) {
-        // draw map
-        val dst = Rect(0, 0, img.width , img.height)
-        c.drawBitmap(img, null, dst, null)
-
-        Paint().also {
-            it.style = Paint.Style.FILL
-            it.color = Color.RED
-
-            try {
-                if (response!!.isSuccessful) {
-                    x = coordToDp(response.body().data.x)
-                    y = coordToDp(105 - response.body().data.y)
-                    Log.d("asd", "x:$x, y:$y")
-                    c.drawCircle(x.toFloat(), y.toFloat(), 50f, it)
-                } else {
-                    Log.d("asdasd", "${response.message()}")
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    /* Thread */
-    class DrawThread(val Holder: SurfaceHolder, val innerMapView: InnerMapView) : Thread() {
-        var bExit: Boolean = false
-        val mHolder: SurfaceHolder = Holder
-
-        override fun run(){
-            var canvas: Canvas
-
-            while(bExit == false){
-                synchronized(mHolder){
-                    canvas = mHolder.lockCanvas()
-
-                    /* onDraw()에 있던거 */
-                    // draw map
-                    val dst = Rect(0, 0, innerMapView.img.width , innerMapView.img.height)
-                    canvas.drawBitmap(innerMapView.img, null, dst, null)
-
-                    Paint().also {
-                        it.style = Paint.Style.FILL
-                        it.color = Color.RED
-
-                        if(innerMapView.response!!.isSuccessful) {
-                            innerMapView.x = innerMapView.coordToDp(innerMapView.response.body().data.x)
-                            innerMapView.y = innerMapView.coordToDp(105 - innerMapView.response.body().data.y)
-                            Log.d("asd", "x:"+innerMapView.x.toString() + ", y:"+innerMapView.y.toString())
-                            canvas.drawCircle(innerMapView.x.toFloat(), innerMapView.y.toFloat(), 50f, it)
-                        }
-                    }
-                    /* onDraw()에 있던거 */
-
-                    mHolder.unlockCanvasAndPost(canvas)
-                }
-            }
+    private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            scaleFactor *= detector.scaleFactor
+            scaleFactor = Math.max(MIN_ZOOM, Math.min(scaleFactor, MAX_ZOOM))
+            return true
         }
     }
 }
