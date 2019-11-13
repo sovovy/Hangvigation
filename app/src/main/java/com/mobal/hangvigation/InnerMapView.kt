@@ -13,7 +13,7 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
     private var thread: Thread? = null
     var x: Int
     var y: Int
-    val response: Response<PostCoordResponse>? = null
+    var response: Response<PostCoordResponse>? = null
 
     init {
         holder.addCallback(this)
@@ -25,38 +25,6 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         return super.onTouchEvent(event)
     }
-
-//    override fun onDraw(canvas: Canvas) {
-//        super.onDraw(canvas)
-//        setBackgroundColor(Color.WHITE)
-//
-//        // draw map
-////        val dst = Rect(0, 0, img.width , img.height)
-////        canvas.drawBitmap(img, null, dst, null)
-////
-////
-////        Paint().also {
-////            it.style = Paint.Style.FILL
-////            it.color = Color.RED
-////            canvas.drawCircle(coordToDp(10, 10), 0f, 50f, it)
-////        }
-//
-////        Line
-//
-////        val MyPaint = Paint()
-////        MyPaint.strokeWidth = 5f
-////        MyPaint.style = Paint.Style.STROKE
-////        MyPaint.color = Color.GRAY
-////
-////        val path = Path()
-////        path.moveTo(100f, 100f)
-////        path.lineTo(100f, 100f)
-////        path.lineTo(100f, 200f)
-////        path.lineTo(200f, 100f)
-////        path.lineTo(200f, 200f)
-////        path.lineTo(300f, 100f)
-////        canvas.drawPath(path, MyPaint)
-//    }
 
     override fun onMeasure(wMS: Int, hMS: Int) {
         setMeasuredDimension(2511, 8505)
@@ -113,12 +81,12 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
 
             try {
                 if (response!!.isSuccessful) {
-                    x = coordToDp(response.body().data.x)
-                    y = coordToDp(105 - response.body().data.y)
+                    x = coordToDp(response!!.body().data.x)
+                    y = coordToDp(105 - response!!.body().data.y)
                     Log.d("asd", "x:$x, y:$y")
                     c.drawCircle(x.toFloat(), y.toFloat(), 50f, it)
                 } else {
-                    Log.d("asdasd", "${response.message()}")
+                    Log.d("asdasd", "${response!!.message()}")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -148,8 +116,8 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
                         it.color = Color.RED
 
                         if(innerMapView.response!!.isSuccessful) {
-                            innerMapView.x = innerMapView.coordToDp(innerMapView.response.body().data.x)
-                            innerMapView.y = innerMapView.coordToDp(105 - innerMapView.response.body().data.y)
+                            innerMapView.x = innerMapView.coordToDp(innerMapView.response!!.body().data.x)
+                            innerMapView.y = innerMapView.coordToDp(105 - innerMapView.response!!.body().data.y)
                             Log.d("asd", "x:"+innerMapView.x.toString() + ", y:"+innerMapView.y.toString())
                             canvas.drawCircle(innerMapView.x.toFloat(), innerMapView.y.toFloat(), 50f, it)
                         }
