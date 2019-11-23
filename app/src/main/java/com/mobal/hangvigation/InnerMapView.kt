@@ -7,9 +7,10 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.widget.ScrollView
 import retrofit2.Response
 
-class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), SurfaceHolder.Callback, Runnable {
+class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertical: ScrollView) : SurfaceView(ctx), SurfaceHolder.Callback, Runnable {
     private val mHolder: SurfaceHolder = holder
     private var thread: Thread? = null
     var x: Int
@@ -93,20 +94,18 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
 
 
         // draw map
-        val dst = Rect(0, 0, img.width , img.height)
+        val dst = Rect(0, 0, 1240 , 4200)
         c.drawBitmap(img, null, dst, null)
 
         Paint().also {
             it.style = Paint.Style.FILL
-            it.color = Color.RED
+            it.color = Color.parseColor("#FF4545")
 
             try {
-                if (response!!.isSuccessful) {
-                    x = coordToDp(response!!.body().data.x)
-                    y = coordToDp(105 - response!!.body().data.y)
-                    Log.d("asd", "x:$x, y:$y")
-                    c.drawCircle(x.toFloat(), y.toFloat(), 50f, it)
-                }
+                x = coordToDp(17)
+                y = coordToDp(105 - 27)
+                c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
+                moveScreen(27)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -128,13 +127,19 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
         c.restore()
     }
 
+    private fun moveScreen(posY: Int) {
+        // max Y val : 2352
+        sv_vertical.scrollTo(0, ((105-posY)*22.4).toInt())
+    }
+
     override fun onMeasure(wMS: Int, hMS: Int) {
-        setMeasuredDimension(2511, 8505)
+        setMeasuredDimension(1240, 4200)
     }
     private fun coordToDp(coord: Int) : Int {
         // 이미지 좌표 최대값 (31/105)
-        // 캔버스 크기 (2511, 8505)
-        return coord*81
+        // 캔버스 크기 (2511, 8505) (before)
+        // 캔버스 크기 (1240, 4200)
+        return coord*40
     }
 
     /* SurfaceView */
@@ -180,7 +185,3 @@ class InnerMapView(val ctx: Context, val img: Bitmap) : SurfaceView(ctx), Surfac
         }
     }
 }
-
-// TODO
-// 서버에서 받은 현재 위치 값을 canvas 좌표에서 찾아 점 그리기
-// 맵 확대-축소 가능하게

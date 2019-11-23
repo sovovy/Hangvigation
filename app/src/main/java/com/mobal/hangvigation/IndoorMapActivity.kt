@@ -42,7 +42,7 @@ class IndoorMapActivity : AppCompatActivity() {
                 if (action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                     Log.d("ASDF", "ASDASDAS")
                     getWIFIScanResult()
-                    wifiManager!!.startScan()
+                    wifiManager!!.reconnect()
                 } else if (action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
                     context.sendBroadcast(Intent("wifi.ON_NETWORK_STATE_CHANGED"))
                 }
@@ -83,8 +83,8 @@ class IndoorMapActivity : AppCompatActivity() {
             wifiManager!!.startScan()
         }
 
-        mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3))
-        prt.addView(InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3)))
+        mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3), sv_vertical)
+        prt.addView(mapView)
 
         // 네트워크
         networkService = ApplicationController.instance.networkService
@@ -156,7 +156,7 @@ class IndoorMapActivity : AppCompatActivity() {
         accessPointsStack = ArrayList(accessPointsStack.sortedWith(compareBy { it.cnt }).reversed())
         var postRssiData = ArrayList<PostCoordData>()
 
-        if (accessPointsStack[0].cnt > 20) {
+        if (accessPointsStack[0].cnt > 5) {
             accessPointsStack.forEach {
                 postRssiData.add(PostCoordData(it.bssid, it.rssi))
             }
