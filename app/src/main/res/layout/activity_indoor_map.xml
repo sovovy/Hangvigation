@@ -4,10 +4,12 @@
               android:layout_height="fill_parent"
               android:orientation="horizontal" >
     <HorizontalScrollView
+            android:id="@+id/sv_horizon"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
         <ScrollView
+                android:id="@+id/sv_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
 
