@@ -40,7 +40,6 @@ class IndoorMapActivity : AppCompatActivity() {
             val action = intent.action
             if (action != null) {
                 if (action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
-                    Log.d("ASDF", "ASDASDAS")
                     getWIFIScanResult()
                     wifiManager!!.startScan()
                 } else if (action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
@@ -97,7 +96,7 @@ class IndoorMapActivity : AppCompatActivity() {
 
         postCoord.enqueue(object : Callback<PostCoordResponse> {
             override fun onFailure(call: Call<PostCoordResponse>?, t: Throwable?) {
-                Log.d("ASDFF", "${t.toString()}")
+                Log.d("ASDFF1", "${t.toString()}")
 
             }
 
@@ -109,18 +108,18 @@ class IndoorMapActivity : AppCompatActivity() {
                     // 예전 방식
                     val x2 = response.body().data.x2
                     val y2 = response.body().data.y2
-                    val x3 = 10
-                    val y3 = 17
+                    val x3 = 17
+                    val y3 = 64
                     sum1 += getDistance(x, y, x3, y3)
                     cnt1++
                     sum2 += getDistance(x2, y2, x3, y3)
                     cnt2++
-                    Log.d("ASDFF", "11111 ${response.body().data.x}, ${response.body().data.y} 오차 거리: ${sum1/cnt1}")
-                    Log.d("ASDFF", "22222 ${response.body().data.x2}, ${response.body().data.y2} 오차 거리: ${sum2/cnt2}")
+                    Log.d("ASDFF2", "11111 ${response.body().data.x}, ${response.body().data.y} 오차 거리: ${sum1/cnt1}")
+                    Log.d("ASDFF3", "22222 ${response.body().data.x2}, ${response.body().data.y2} 오차 거리: ${sum2/cnt2}")
                     mapView.x = response.body().data.x
                     mapView.y = response.body().data.y
                 } else{
-                    Log.d("ASDFF", "${response.message()}")
+                    Log.d("ASDFF4", "${response.message()}")
                 }
             }
 
