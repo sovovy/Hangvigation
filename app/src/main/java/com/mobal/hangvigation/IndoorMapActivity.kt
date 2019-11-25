@@ -37,7 +37,7 @@ class IndoorMapActivity : AppCompatActivity() {
             if (action != null) {
                 if (action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                     getWIFIScanResult()
-                    wifiManager!!.reconnect()
+                    wifiManager!!.startScan()
                 } else if (action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
                     context.sendBroadcast(Intent("wifi.ON_NETWORK_STATE_CHANGED"))
                 }
@@ -104,22 +104,12 @@ class IndoorMapActivity : AppCompatActivity() {
                     mapView.response = response
                     val x = response.body().data.x
                     val y = response.body().data.y
-                    // 예전 방식
-                    val x2 = response.body().data.x2
-                    val y2 = response.body().data.y2
-                    val x3 = 17
-                    val y3 = 64
-                    Log.d("ASDFF2", "11111 ${response.body().data.x}, ${response.body().data.y} 오차 거리: ${getDistance(x, y, x3, y3)}")
-                    Log.d("ASDFF3", "22222 ${response.body().data.x2}, ${response.body().data.y2} 오차 거리: ${getDistance(x2, y2, x3, y3)}")
-                    mapView.x = response.body().data.x
-                    mapView.y = response.body().data.y
+                    Log.d("ASDFF2", "11111 ${response.body().data.x}, ${response.body().data.y}")
+                    mapView.x = x
+                    mapView.y = y
                 } else{
                     Log.d("ASDFF4", "${response.message()}")
                 }
-            }
-
-            private fun getDistance(x: Int, y: Int, i: Int, i1: Int): Float {
-                return ((x-i).toFloat().pow(2) + (y-i1).toFloat().pow(2)).pow(0.5f)
             }
         })
     }
@@ -138,54 +128,11 @@ class IndoorMapActivity : AppCompatActivity() {
         // AP BSSID 중복 제거
         accessPoints = rmOverlap(accessPoints)
 
-        // APStack에 쌓기
-        accessPointsStack = if (accessPointsStack.isEmpty()) {
-            accessPoints
-        } else {
-            addToStack(accessPoints, accessPointsStack)
-        }
-
-
-        // 가장 높은 cnt가 5보다 크면 통신
-        accessPointsStack = ArrayList(accessPointsStack.sortedWith(compareBy { it.cnt }).reversed())
         var postRssiData = ArrayList<PostCoordData>()
-
-        if (accessPointsStack[0].cnt > 5) {
-            accessPointsStack.forEach {
-                postRssiData.add(PostCoordData(it.bssid, it.rssi))
-            }
-
-            network(postRssiData)
-
-            // 다음 위치 추정을 위해 stack 초기화
-            accessPointsStack.clear()
+        accessPoints.forEach {
+            postRssiData.add(PostCoordData(it.bssid, it.rssi))
         }
-    }
-
-    private fun addToStack(new: ArrayList<AccessPoint>, stack: ArrayList<AccessPoint>): ArrayList<AccessPoint> {
-        var res:ArrayList<AccessPoint> = stack
-
-        new.onEach {
-            // stack에 동일한 BSSID가 있다면 해당 stack의 idx 반환
-            val idx = alreadyBssid(it.bssid, stack)
-            if (idx!=-1) {
-                res[idx].rssi = it.rssi
-                res[idx].cnt++
-                res[idx].sum += it.rssi
-            }
-        }
-
-        return res
-    }
-
-    private fun alreadyBssid(bssid: String, stack: ArrayList<AccessPoint>): Int {
-        // stack에 동일한 BSSID가 있다면 해당 stack의 idx 반환
-        for (i in stack.indices) {
-            if (stack[i].bssid == bssid) {
-                return i
-            }
-        }
-        return -1
+        network(postRssiData)
     }
 
     private fun rmOverlap(ap: ArrayList<AccessPoint>): ArrayList<AccessPoint> {

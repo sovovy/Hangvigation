@@ -44,7 +44,6 @@ class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertica
     }
     // Zoom 출처: https://stackoverflow.com/questions/25757544/android-scale-zoom-zoomout-bitmap-on-canvas
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        Log.d("asdasd", "ontouch")
         when(MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
                 mode = DRAG
@@ -105,7 +104,6 @@ class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertica
                 x = coordToDp(response!!.body().data.x)
                 y = coordToDp(105 - response!!.body().data.y)
                 c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
-                moveScreen(response!!.body().data.y)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
