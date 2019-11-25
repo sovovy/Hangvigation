@@ -30,10 +30,6 @@ class IndoorMapActivity : AppCompatActivity() {
     private lateinit var scanResult: List<ScanResult>
     private var permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
     lateinit var mapView : InnerMapView
-    var sum1 = 0.0f
-    var cnt1 = 0
-    var sum2 = 0.0f
-    var cnt2 = 0
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -85,6 +81,9 @@ class IndoorMapActivity : AppCompatActivity() {
         mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3), sv_vertical)
         prt.addView(mapView)
 
+        btn_location.setOnClickListener {
+            mapView.moveScreen()
+        }
         // 네트워크
         networkService = ApplicationController.instance.networkService
 
@@ -110,12 +109,8 @@ class IndoorMapActivity : AppCompatActivity() {
                     val y2 = response.body().data.y2
                     val x3 = 17
                     val y3 = 64
-                    sum1 += getDistance(x, y, x3, y3)
-                    cnt1++
-                    sum2 += getDistance(x2, y2, x3, y3)
-                    cnt2++
-                    Log.d("ASDFF2", "11111 ${response.body().data.x}, ${response.body().data.y} 오차 거리: ${sum1/cnt1}")
-                    Log.d("ASDFF3", "22222 ${response.body().data.x2}, ${response.body().data.y2} 오차 거리: ${sum2/cnt2}")
+                    Log.d("ASDFF2", "11111 ${response.body().data.x}, ${response.body().data.y} 오차 거리: ${getDistance(x, y, x3, y3)}")
+                    Log.d("ASDFF3", "22222 ${response.body().data.x2}, ${response.body().data.y2} 오차 거리: ${getDistance(x2, y2, x3, y3)}")
                     mapView.x = response.body().data.x
                     mapView.y = response.body().data.y
                 } else{

@@ -102,10 +102,10 @@ class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertica
             it.color = Color.parseColor("#FF4545")
 
             try {
-                x = coordToDp(17)
-                y = coordToDp(105 - 27)
+                x = coordToDp(response!!.body().data.x)
+                y = coordToDp(105 - response!!.body().data.y)
                 c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
-                moveScreen(27)
+                moveScreen(response!!.body().data.y)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -127,7 +127,7 @@ class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertica
         c.restore()
     }
 
-    private fun moveScreen(posY: Int) {
+    fun moveScreen(posY: Int = response!!.body().data.y) {
         // max Y val : 2352
         sv_vertical.scrollTo(0, ((105-posY)*22.4).toInt())
     }
