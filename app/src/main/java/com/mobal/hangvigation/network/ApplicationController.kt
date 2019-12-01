@@ -1,4 +1,4 @@
-package com.mobal.hangvigation
+package com.mobal.hangvigation.network
 
 import android.app.Application
 import retrofit2.Retrofit
@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class ApplicationController: Application() {
     lateinit var networkService: NetworkService
-    private val baseUrl = "http://13.124.154.31:3000/"
+    private val baseUrl = "http://13.209.87.152:3000/"
     companion object {
         lateinit var instance : ApplicationController
     }

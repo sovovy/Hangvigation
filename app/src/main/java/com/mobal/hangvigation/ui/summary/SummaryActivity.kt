@@ -1,7 +1,8 @@
-package com.mobal.hangvigation
+package com.mobal.hangvigation.ui.summary
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.mobal.hangvigation.R
 
 class SummaryActivity : AppCompatActivity() {
 

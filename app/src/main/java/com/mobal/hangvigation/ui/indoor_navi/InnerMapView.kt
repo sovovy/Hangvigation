@@ -1,4 +1,4 @@
-package com.mobal.hangvigation
+package com.mobal.hangvigation.ui.indoor_navi
 
 import android.content.Context
 import android.graphics.*
@@ -8,6 +8,7 @@ import android.view.ScaleGestureDetector
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.ScrollView
+import com.mobal.hangvigation.network.PostCoordResponse
 import retrofit2.Response
 
 class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertical: ScrollView) : SurfaceView(ctx), SurfaceHolder.Callback, Runnable {
@@ -105,7 +106,7 @@ class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertica
                 y = coordToDp(105 - response!!.body().data.y)
                 c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
             } catch (e: Exception) {
-                e.printStackTrace()
+//                e.printStackTrace()
             }
         }
 

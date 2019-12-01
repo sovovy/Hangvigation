@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#fff"
-        tools:context=".MainActivity">
+        tools:context=".ui.main.MainActivity">
 
     <View
         android:id="@+id/view_top_main"

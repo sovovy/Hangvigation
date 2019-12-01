@@ -1,4 +1,4 @@
-package com.mobal.hangvigation
+package com.mobal.hangvigation.network
 
 data class PostCoordData (
     var bssid:String,
@@ -7,7 +7,7 @@ data class PostCoordData (
 
 data class PostCoordResponse(
     var message:String,
-    var data:PostCoordResponseData
+    var data: PostCoordResponseData
 )
 
 data class PostCoordResponseData(

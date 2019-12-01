@@ -3,24 +3,24 @@
           package="com.mobal.hangvigation">
 
     <application
-            android:name=".ApplicationController"
+            android:name=".network.ApplicationController"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".IndoorMapActivity">
+        <activity android:name=".ui.indoor_navi.IndoorMapActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".IndoorInfoActivity"/>
-        <activity android:name=".PlaceListActivity"/>
-        <activity android:name=".SummaryActivity"/>
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.indoor_info.IndoorInfoActivity"/>
+        <activity android:name=".ui.indoor_info.PlaceListActivity"/>
+        <activity android:name=".ui.summary.SummaryActivity"/>
+        <activity android:name=".ui.main.MainActivity">
         </activity>
     </application>
 

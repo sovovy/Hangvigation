@@ -1,4 +1,4 @@
-package com.mobal.hangvigation
+package com.mobal.hangvigation.ui.indoor_navi
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -16,11 +16,15 @@ import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import com.mobal.hangvigation.R
+import com.mobal.hangvigation.network.ApplicationController
+import com.mobal.hangvigation.network.NetworkService
+import com.mobal.hangvigation.network.PostCoordData
+import com.mobal.hangvigation.network.PostCoordResponse
 import kotlinx.android.synthetic.main.activity_indoor_map.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.math.pow
 
 class IndoorMapActivity : AppCompatActivity() {
     private var accessPoints: ArrayList<AccessPoint> = ArrayList()
@@ -78,7 +82,11 @@ class IndoorMapActivity : AppCompatActivity() {
             wifiManager!!.startScan()
         }
 
-        mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, R.drawable.f3), sv_vertical)
+        mapView = InnerMapView(
+            this,
+            BitmapFactory.decodeResource(resources, R.drawable.f3),
+            sv_vertical
+        )
         prt.addView(mapView)
 
         btn_location.setOnClickListener {
@@ -122,7 +130,13 @@ class IndoorMapActivity : AppCompatActivity() {
 
         for (i in scanResult.indices) {
             val result = scanResult[i]
-            accessPoints.add(AccessPoint(result.SSID, result.BSSID, result.level.toDouble()))
+            accessPoints.add(
+                AccessPoint(
+                    result.SSID,
+                    result.BSSID,
+                    result.level.toDouble()
+                )
+            )
         }
 
         // AP BSSID 중복 제거
