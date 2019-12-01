@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="horizontal" >
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="horizontal">
     <HorizontalScrollView
             android:id="@+id/sv_horizon"
             android:layout_width="match_parent"
@@ -21,12 +21,54 @@
             </LinearLayout>
         </ScrollView>
     </HorizontalScrollView>
-    <Button
+    <ImageButton
             android:id="@+id/btn_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="위치로"
+            android:background="@drawable/mlocation"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_margin="15dp"/>
+    <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="7dp">
+        <com.mobal.hangvigation.ui.indoor_navi.FloorButton
+                android:id="@+id/fl_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                app:text="4층"
+                app:click="false"
+        />
+        <com.mobal.hangvigation.ui.indoor_navi.FloorButton
+                android:id="@+id/fl_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/fl_4"
+                app:text="3층"
+                app:click="false"
+        />
+        <com.mobal.hangvigation.ui.indoor_navi.FloorButton
+                android:id="@+id/fl_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/fl_3"
+                app:text="2층"
+                app:click="false"
+        />
+        <com.mobal.hangvigation.ui.indoor_navi.FloorButton
+                android:id="@+id/fl_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/fl_2"
+                app:text="1층"
+                app:click="false"
+        />
+    </RelativeLayout>
 </RelativeLayout>

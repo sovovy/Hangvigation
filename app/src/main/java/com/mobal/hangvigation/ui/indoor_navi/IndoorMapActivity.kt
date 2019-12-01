@@ -28,7 +28,6 @@ import retrofit2.Response
 
 class IndoorMapActivity : AppCompatActivity() {
     private var accessPoints: ArrayList<AccessPoint> = ArrayList()
-    private var accessPointsStack: ArrayList<AccessPoint> = ArrayList()
     private lateinit var networkService: NetworkService
     private var wifiManager: WifiManager? = null
     private lateinit var scanResult: List<ScanResult>
@@ -58,12 +57,28 @@ class IndoorMapActivity : AppCompatActivity() {
                 finish()
             }
         }
+        initWIFIScan()
     }
 
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        unregisterReceiver(mWifiScanReceiver)
-//    }
+    override fun onRestart() {
+        super.onRestart()
+        initWIFIScan()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initWIFIScan()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(mWifiScanReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(mWifiScanReceiver)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +111,12 @@ class IndoorMapActivity : AppCompatActivity() {
         networkService = ApplicationController.instance.networkService
 
     }
-
+    private fun initWIFIScan() {
+        val filter = IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION)
+        registerReceiver(mWifiScanReceiver, filter)
+        wifiManager!!.startScan()
+    }
     /* 통신 */
     private fun network(rssi: ArrayList<PostCoordData>){
         val postCoord = networkService.postCoord(rssi)
