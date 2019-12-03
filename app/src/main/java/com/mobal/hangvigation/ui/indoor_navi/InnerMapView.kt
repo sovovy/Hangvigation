@@ -6,7 +6,7 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.ScrollView
-import com.mobal.hangvigation.network.PostCoordResponse
+import com.mobal.hangvigation.model.PostCoordResponse
 import retrofit2.Response
 
 class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: ScrollView) : SurfaceView(ctx), SurfaceHolder.Callback, Runnable {
@@ -14,7 +14,8 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
     private var thread: Thread? = null
     var x: Int
     var y: Int
-    var response: Response<PostCoordResponse>? = null
+    var responseCoord: Response<PostCoordResponse>? = null
+    var route = FloatArray(0)
 
     init {
         holder.addCallback(this)
@@ -29,14 +30,7 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
         val dst = Rect(0, 0, 1240 , 4200)
         c.drawBitmap(img, null, dst, null)
 
-        // test coords
-        var a = floatArrayOf(
-            a(18),a(88),a(18),a(95),
-            a(16),a(58),a(19),a(58),
-            a(16),a(70),a(18),a(78)
-        )
-
-        drawLine(c, a)
+        drawLine(c, route)
         drawCircle(c)
 
         c.restore()
@@ -67,8 +61,8 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
             it.style = Paint.Style.FILL
             it.color = Color.parseColor("#FF6A6A")
             try {
-//                x = coordToDp(response!!.body().data.x)
-//                y = coordToDp(105 - response!!.body().data.y)
+//                x = coordToDp(responseCoord!!.body().data.x)
+//                y = coordToDp(105 - responseCoord!!.body().data.y)
 //                c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
                 // test
                 x = coordToDp(10)
@@ -90,7 +84,7 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
         }
     }
 
-    fun moveScreen(posY: Int = response!!.body().data.y) {
+    fun moveScreen(posY: Int = responseCoord!!.body().data.y) {
         // max Y val : 2352
         sv_vertical.scrollTo(0, ((105-posY)*22.4).toInt())
     }

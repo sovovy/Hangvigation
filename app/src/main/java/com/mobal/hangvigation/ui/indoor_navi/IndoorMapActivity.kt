@@ -17,10 +17,9 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.mobal.hangvigation.R
+import com.mobal.hangvigation.model.*
 import com.mobal.hangvigation.network.ApplicationController
 import com.mobal.hangvigation.network.NetworkService
-import com.mobal.hangvigation.network.PostCoordData
-import com.mobal.hangvigation.network.PostCoordResponse
 import kotlinx.android.synthetic.main.activity_indoor_map.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -34,6 +33,7 @@ class IndoorMapActivity : AppCompatActivity() {
     private var permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
     lateinit var mapView : InnerMapView
     private var lastFloor = 0
+    val mRoute = HashMap<Int, FloatArray>()
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -109,12 +109,13 @@ class IndoorMapActivity : AppCompatActivity() {
             mapView.moveScreen()
         }
 
-        // current location's floor
-        fl_3.performClick()
-
         // 네트워크
         networkService = ApplicationController.instance.networkService
 
+        // route communication
+        networkRoute()
+        // current location's floor
+        fl_3.performClick()
     }
 
     fun lastChange(f: Int) {
@@ -139,6 +140,7 @@ class IndoorMapActivity : AppCompatActivity() {
         }
 
         mapView.img = BitmapFactory.decodeResource(resources, imgId)
+        mapView.route = mRoute[f]?: floatArrayOf()
     }
 
     private fun initWIFIScan() {
@@ -148,28 +150,78 @@ class IndoorMapActivity : AppCompatActivity() {
         wifiManager!!.startScan()
     }
     /* 통신 */
-    private fun network(rssi: ArrayList<PostCoordData>){
+    private fun networkCoord(rssi: ArrayList<PostCoordData>) {
         val postCoord = networkService.postCoord(rssi)
 
         postCoord.enqueue(object : Callback<PostCoordResponse> {
             override fun onFailure(call: Call<PostCoordResponse>?, t: Throwable?) {
-                Log.d("ASDFF1", "${t.toString()}")
+                Log.d("COORD_FAIL", t.toString())
 
             }
 
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
-                if(response!!.isSuccessful){
-                    mapView.response = response
-                    val x = response.body().data.x
-                    val y = response.body().data.y
-                    Log.d("ASDFF2", "11111 ${response.body().data.x}, ${response.body().data.y}")
-                    mapView.x = x
-                    mapView.y = y
-                } else{
-                    Log.d("ASDFF4", "${response.message()}")
+                if (response!!.isSuccessful) {
+                    mapView.responseCoord = response
+                    mapView.x = response.body().data.x
+                    mapView.y = response.body().data.y
+                } else {
+                    Log.d("COORD_UNSUCCESSFUL", response.message())
                 }
             }
         })
+    }
+
+    private fun networkRoute() {
+
+        val postRoute = networkService.postRoute(PostRouteData(18, 5, 3, 17, 33, 3))
+
+        postRoute.enqueue(object : Callback<PostRouteResponse> {
+            override fun onFailure(call: Call<PostRouteResponse>?, t: Throwable?) {
+                Log.d("ROUTE_FAIL", t.toString())
+            }
+
+            override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
+                if(response!!.isSuccessful){
+                    responseToRoute(response.body().data)
+                    mapView.route = mRoute[lastFloor]?:mRoute[3]!!
+
+                } else{
+                    Log.d("ROUTE_UNSUCCESSFUL", response.message())
+                }
+            }
+
+        })
+
+    }
+
+    private fun responseToRoute(res: ArrayList<PostRouteResponseData>) {
+        var tmpFloor = res[0].z
+        var tmpArr = ArrayList<Float>()
+
+        // only first element puts once, others put twice
+        tmpArr.add((res[0].x*40).toFloat())
+        tmpArr.add(((105-res[0].y)*40).toFloat())
+        res.removeAt(0)
+
+        res.forEach {
+            if (tmpFloor!=it.z) {
+                if (tmpArr.size!=0) {
+                    tmpArr.removeAt(tmpArr.size-1)
+                    mRoute[tmpFloor] = tmpArr.toFloatArray()
+                    tmpArr = ArrayList()
+                    tmpArr.add((it.x*40).toFloat())
+                    tmpArr.add(((105-it.y)*40).toFloat())
+                }
+                tmpFloor = it.z
+            }
+            tmpArr.add((it.x*40).toFloat())
+            tmpArr.add(((105-it.y)*40).toFloat())
+            tmpArr.add((it.x*40).toFloat())
+            tmpArr.add(((105-it.y)*40).toFloat())
+        }
+        tmpArr.removeAt(tmpArr.size-1)
+        mRoute[tmpFloor] = tmpArr.toFloatArray()
+        Log.d("ASDFF", mRoute.toString())
     }
 
     /* WIFI Scan 값 관리 */
@@ -211,7 +263,6 @@ class IndoorMapActivity : AppCompatActivity() {
         }
         return res
     }
-
 
     /* Location permission 을 위한 메서드들 */
     private fun checkPermissions(): Boolean {
