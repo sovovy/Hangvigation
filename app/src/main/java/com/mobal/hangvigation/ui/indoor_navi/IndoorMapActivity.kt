@@ -33,6 +33,7 @@ class IndoorMapActivity : AppCompatActivity() {
     private lateinit var scanResult: List<ScanResult>
     private var permissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
     lateinit var mapView : InnerMapView
+    private var lastFloor = 0
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -107,10 +108,39 @@ class IndoorMapActivity : AppCompatActivity() {
         btn_location.setOnClickListener {
             mapView.moveScreen()
         }
+
+        // current location's floor
+        fl_3.performClick()
+
         // 네트워크
         networkService = ApplicationController.instance.networkService
 
     }
+
+    fun lastChange(f: Int) {
+        changeMap(f)
+        when (lastFloor) {
+            1 -> fl_1.changeBg()
+            2 -> fl_2.changeBg()
+            3 -> fl_3.changeBg()
+            4 -> fl_4.changeBg()
+        }
+        lastFloor = f
+    }
+
+    private fun changeMap(f: Int) {
+        var imgId = 3
+
+        when (f) {
+            1 -> imgId = R.drawable.f1
+            2 -> imgId = R.drawable.f2
+            3 -> imgId = R.drawable.f3
+            4 -> imgId = R.drawable.f4
+        }
+
+        mapView.img = BitmapFactory.decodeResource(resources, imgId)
+    }
+
     private fun initWIFIScan() {
         val filter = IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION)
@@ -166,7 +196,7 @@ class IndoorMapActivity : AppCompatActivity() {
         accessPoints.forEach {
             postRssiData.add(PostCoordData(it.bssid, it.rssi))
         }
-        network(postRssiData)
+//        network(postRssiData)
     }
 
     private fun rmOverlap(ap: ArrayList<AccessPoint>): ArrayList<AccessPoint> {

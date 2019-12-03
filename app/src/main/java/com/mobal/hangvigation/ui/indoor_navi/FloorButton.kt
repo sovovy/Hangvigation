@@ -15,8 +15,12 @@ class FloorButton(context: Context?, attrs: AttributeSet?) : ConstraintLayout(co
     private var bg_click = false
 
     override fun onClick(v: View?) {
-        bg_click = !bg_click
+        changeBg()
+        (context as IndoorMapActivity).lastChange(tv_floor_flbtn.text.toString()[0].toString().toInt())
+    }
 
+    fun changeBg(){
+        bg_click = !bg_click
         if (bg_click){
             cl_floor_flbtn.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
             tv_floor_flbtn.setTextColor(Color.WHITE)
