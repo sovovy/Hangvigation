@@ -8,19 +8,22 @@ import android.view.SurfaceView
 import android.widget.ScrollView
 import com.mobal.hangvigation.model.PostCoordResponse
 import retrofit2.Response
+import kotlin.math.abs
 
 class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: ScrollView) : SurfaceView(ctx), SurfaceHolder.Callback, Runnable {
     private val mHolder: SurfaceHolder = holder
     private var thread: Thread? = null
-    var x: Int
-    var y: Int
+    var x: Int = 0
+    var y: Int = 0
+    private var prevX : Int = 0
+    private var prevY : Int = 0
+    var destX = 17
+    var destY = 33
     var responseCoord: Response<PostCoordResponse>? = null
     var route = FloatArray(0)
 
     init {
         holder.addCallback(this)
-        x = 0
-        y = 0
     }
 
     private fun doDraw(c: Canvas) {
@@ -61,13 +64,20 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
             it.style = Paint.Style.FILL
             it.color = Color.parseColor("#FF6A6A")
             try {
-//                x = coordToDp(responseCoord!!.body().data.x)
-//                y = coordToDp(105 - responseCoord!!.body().data.y)
-//                c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
-                // test
-                x = coordToDp(10)
-                y = coordToDp(105 - 17)
-                c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
+                if (abs(prevY-y)<=10 || prevX==0) {
+//                    x = coordToDp(responseCoord!!.body().data.x)
+//                    y = coordToDp(105 - responseCoord!!.body().data.y)
+//                    c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
+
+                    // test
+                    x = coordToDp(17)
+                    y = coordToDp(105 - 17)
+                    //
+
+                    prevX = x
+                    prevY = y
+                    c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
+                }
             } catch (e: Exception) {
             }
         }
@@ -76,9 +86,7 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
             it.style = Paint.Style.FILL
             it.color = Color.parseColor("#FFD35C")
             try {
-                x = coordToDp(17)
-                y = coordToDp(105 - 63)
-                c.drawCircle(x.toFloat(), y.toFloat(), 45f, it)
+                c.drawCircle(coordToDp(destX).toFloat(), coordToDp(105 - destY).toFloat(), 50f, it)
             } catch (e: Exception) {
             }
         }

@@ -113,7 +113,16 @@ class IndoorMapActivity : AppCompatActivity() {
         networkService = ApplicationController.instance.networkService
 
         // route communication
-        networkRoute()
+//        networkRoute()
+        val tmp =
+            arrayListOf(PostRouteResponseData(18, 5, 3), PostRouteResponseData(18, 9, 3),
+                PostRouteResponseData(18, 12, 3), PostRouteResponseData(18, 16, 3),
+                PostRouteResponseData(18, 22, 3), PostRouteResponseData(18, 25, 3),
+                PostRouteResponseData(18, 33, 3), PostRouteResponseData(17, 33, 3),
+                PostRouteResponseData(18, 22, 4), PostRouteResponseData(18, 75, 4),
+                        PostRouteResponseData(15, 75, 4))
+        responseToRoute(tmp)
+        mapView.route = mRoute[lastFloor]?:mRoute[3]!!
         // current location's floor
         fl_3.performClick()
     }
