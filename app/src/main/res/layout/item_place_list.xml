@@ -6,7 +6,7 @@
         android:layout_height="match_parent">
 
     <Button
-            android:id="@+id/bt_first_main"
+            android:id="@+id/btn_first_main"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:background="@drawable/round_square_yellow"
