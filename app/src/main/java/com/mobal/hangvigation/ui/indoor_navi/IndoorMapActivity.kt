@@ -171,8 +171,6 @@ class IndoorMapActivity : AppCompatActivity() {
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
                 if (response!!.isSuccessful) {
                     mapView.responseCoord = response
-                    mapView.x = response.body().data.x
-                    mapView.y = response.body().data.y
                 } else {
                     Log.d("COORD_UNSUCCESSFUL", response.message())
                 }
@@ -257,7 +255,7 @@ class IndoorMapActivity : AppCompatActivity() {
         accessPoints.forEach {
             postRssiData.add(PostCoordData(it.bssid, it.rssi))
         }
-//        network(postRssiData)
+        networkCoord(postRssiData)
     }
 
     private fun rmOverlap(ap: ArrayList<AccessPoint>): ArrayList<AccessPoint> {
