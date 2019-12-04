@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FloorButton">
+        <attr name="click" format="reference|boolean" />
+        <attr name="text" format="reference|string" />
+    </declare-styleable>
+</resources>
