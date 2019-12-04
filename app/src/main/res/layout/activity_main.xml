@@ -8,6 +8,13 @@
         android:background="#fff"
         tools:context=".MainActivity">
 
+    <RelativeLayout
+            android:id="@+id/map_view_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    </RelativeLayout>
+
     <View
         android:id="@+id/view_top_main"
         android:layout_width="match_parent"

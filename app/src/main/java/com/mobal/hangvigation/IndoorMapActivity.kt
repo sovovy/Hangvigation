@@ -20,7 +20,6 @@ import kotlinx.android.synthetic.main.activity_indoor_map.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.math.pow
 
 class IndoorMapActivity : AppCompatActivity() {
     private var accessPoints: ArrayList<AccessPoint> = ArrayList()

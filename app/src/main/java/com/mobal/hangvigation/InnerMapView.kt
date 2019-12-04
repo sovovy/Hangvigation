@@ -105,7 +105,7 @@ class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertica
                 y = coordToDp(105 - response!!.body().data.y)
                 c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
             } catch (e: Exception) {
-                e.printStackTrace()
+//                e.printStackTrace()
             }
         }
 
@@ -167,7 +167,7 @@ class InnerMapView(ctx: Context, private val img: Bitmap, private val sv_vertica
                     Thread.sleep(50)
                 }
             } catch (e: InterruptedException) {
-                e.printStackTrace()
+//                e.printStackTrace()
             } finally {
                 if(canvas != null)
                     mHolder.unlockCanvasAndPost(canvas)
