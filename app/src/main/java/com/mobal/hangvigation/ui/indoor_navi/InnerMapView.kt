@@ -9,6 +9,7 @@ import android.widget.ScrollView
 import com.mobal.hangvigation.model.PostCoordResponse
 import com.mobal.hangvigation.model.PostRouteResponseData
 import retrofit2.Response
+import java.lang.IllegalStateException
 import kotlin.math.abs
 
 class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: ScrollView) : SurfaceView(ctx), SurfaceHolder.Callback, Runnable {
@@ -112,6 +113,7 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
     /* SurfaceView */
     override fun surfaceCreated(holder: SurfaceHolder?) {
         thread = Thread(this)
+        thread!!.isDaemon = true
         thread!!.start()
     }
 
@@ -132,6 +134,7 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
             try {
                 canvas = mHolder.lockCanvas()
                 synchronized(mHolder) {
+                    canvas?:return@synchronized
                     doDraw(canvas)
                     Thread.sleep(50)
                 }

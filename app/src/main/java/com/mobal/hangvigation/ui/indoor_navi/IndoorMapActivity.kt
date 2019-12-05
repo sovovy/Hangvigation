@@ -24,6 +24,7 @@ import kotlinx.android.synthetic.main.activity_indoor_map.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.IllegalArgumentException
 
 class IndoorMapActivity : AppCompatActivity() {
     private var accessPoints: ArrayList<AccessPoint> = ArrayList()
@@ -78,7 +79,11 @@ class IndoorMapActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(mWifiScanReceiver)
+        try {
+            unregisterReceiver(mWifiScanReceiver)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
