@@ -68,6 +68,7 @@
             android:textSize="15sp"
             android:textColor="#7b7b7b"
             android:lineSpacingExtra="7sp"
+            android:gravity="center_horizontal"
             android:text="다음 분류를 선택해주세요 :)"
             app:layout_constraintTop_toBottomOf="@+id/view_bottom_place_list"
             app:layout_constraintStart_toStartOf="parent"

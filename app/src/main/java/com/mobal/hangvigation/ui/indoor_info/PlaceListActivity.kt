@@ -26,12 +26,42 @@ class PlaceListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place_list)
 
-        title = intent.getStringExtra("TITLE")
-        tv_top_place.text = title
-
         iv_back_place.setOnClickListener { onBackPressed() }
 
-        communication()
+        if (intent.getStringExtra("QUERY")!=null) {
+            // search
+            tv_top_place.text = intent.getStringExtra("QUERY")
+            communicationSearch()
+        } else {
+            title = intent.getStringExtra("TITLE")
+            tv_top_place.text = title
+
+            communicationDivision()
+        }
+    }
+
+    private fun communicationSearch() {
+        val getSearch= networkService.getSearch(intent.getStringExtra("QUERY"))
+        getSearch.enqueue(object : Callback<GetDivisionResponse> {
+            override fun onFailure(call: Call<GetDivisionResponse>?, t: Throwable?) {
+                Log.d("Error::Search", "$t")
+                setNoPlaceUI("검색 결과가 없습니다\n다시 검색해보세요 :)")
+            }
+
+            override fun onResponse(call: Call<GetDivisionResponse>?, response: Response<GetDivisionResponse>?) {
+                if (response!!.isSuccessful) {
+                    divisionOrPlaceItems = response.body().data
+                    if (divisionOrPlaceItems.size==0) {
+                        setNoPlaceUI("검색 결과가 없습니다\n다시 검색해보세요 :)")
+                    } else {
+                        invisibleDivisionUI()
+                        setRecyclerPlace()
+                    }
+                } else {
+                    setNoPlaceUI("검색 결과가 없습니다\n다시 검색해보세요 :)")
+                }
+            }
+        })
     }
 
     private fun setRecyclerDivision() {
@@ -45,11 +75,12 @@ class PlaceListActivity : AppCompatActivity() {
         rv_place_list.adapter = placeAdapter
     }
 
-    private fun communication() {
+    private fun communicationDivision() {
         val getDivision = networkService.getDivision(intent.getIntExtra("DIVISION_IDX", 2))
         getDivision.enqueue(object : Callback<GetDivisionResponse> {
             override fun onFailure(call: Call<GetDivisionResponse>?, t: Throwable?) {
                 Log.d("Error::PlaceList", "$t")
+                setNoPlaceUI("장소가 없습니다\n다른 분류를 눌러보세요 :)")
             }
 
             override fun onResponse(call: Call<GetDivisionResponse>?, response: Response<GetDivisionResponse>?) {
@@ -62,6 +93,8 @@ class PlaceListActivity : AppCompatActivity() {
                         invisibleDivisionUI()
                         setRecyclerPlace()
                     }
+                } else {
+                    setNoPlaceUI("장소가 없습니다\n다른 분류를 눌러보세요 :)")
                 }
             }
         })
@@ -72,5 +105,11 @@ class PlaceListActivity : AppCompatActivity() {
         rv_top_division.visibility = View.INVISIBLE
         tv_center_place_list.visibility = View.INVISIBLE
         iv_center_place_list.visibility = View.INVISIBLE
+    }
+
+    private fun setNoPlaceUI(guide: String) {
+        view_bottom_place_list.visibility = View.INVISIBLE
+        rv_top_division.visibility = View.INVISIBLE
+        tv_center_place_list.text = guide
     }
 }

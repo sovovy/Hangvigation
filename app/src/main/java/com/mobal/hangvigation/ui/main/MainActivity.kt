@@ -3,8 +3,10 @@ package com.mobal.hangvigation.ui.main
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.mobal.hangvigation.ui.indoor_info.PlaceListActivity
 import com.mobal.hangvigation.R
 import com.mobal.hangvigation.ui.indoor_navi.IndoorMapActivity
@@ -148,9 +150,44 @@ class MainActivity : AppCompatActivity() {
         mapView.addPOIItem(marker12)
 
         setClickListener()
+        setSearchListener()
+    }
+
+    private fun setSearchListener() {
+        // 공통 listener
+        val searchListener = View.OnClickListener {
+            moveToSearch((it as TextView).text.toString())
+        }
+
+        tv_hot1_search.setOnClickListener(searchListener)
+        tv_hot2_search.setOnClickListener(searchListener)
+        tv_hot3_search.setOnClickListener(searchListener)
+        tv_hot4_search.setOnClickListener(searchListener)
+        tv_recent1_search.setOnClickListener(searchListener)
+        tv_recent2_search.setOnClickListener(searchListener)
+        tv_recent3_search.setOnClickListener(searchListener)
+        tv_recent4_search.setOnClickListener(searchListener)
+    }
+
+    private fun moveToSearch(word: String) {
+        Intent(this@MainActivity, PlaceListActivity::class.java).let {
+        it.putExtra("QUERY", word)
+        startActivity(it)
+    }
+
     }
 
     private fun setClickListener() {
+        // enter key event
+        et_bar_search.setOnKeyListener { _, keyCode, event ->
+            if ((event.action== KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                moveToSearch(et_bar_search.text.toString())
+                true
+            } else {
+                false
+            }
+        }
+
         // 검색 버튼 관련 VISIBILITY 관리
         iv_search_main.setOnClickListener {
             cl_second_main.visibility = View.GONE
@@ -167,6 +204,7 @@ class MainActivity : AppCompatActivity() {
         btn_first_main.setOnClickListener {
 //            Intent(this, PlaceListActivity::class.java).let {
 //                it.putExtra("DIVISION_IDX", 2)
+//                it.putExtra("TITLE", "강의실")
 //                startActivity(it)
 //            }
 
@@ -178,6 +216,7 @@ class MainActivity : AppCompatActivity() {
         btn_second_main.setOnClickListener {
             Intent(this, PlaceListActivity::class.java).let {
                 it.putExtra("DIVISION_IDX", 66)
+                it.putExtra("TITLE", "편의시설")
                 startActivity(it)
             }
         }
@@ -185,6 +224,7 @@ class MainActivity : AppCompatActivity() {
         btn_third_main.setOnClickListener {
             Intent(this, PlaceListActivity::class.java).let {
                 it.putExtra("DIVISION_IDX", 70)
+                it.putExtra("TITLE", "연구∙사무실")
                 startActivity(it)
             }
         }
@@ -192,6 +232,7 @@ class MainActivity : AppCompatActivity() {
         btn_fourth_main.setOnClickListener {
             Intent(this, PlaceListActivity::class.java).let {
                 it.putExtra("DIVISION_IDX", 86)
+                it.putExtra("TITLE", "그 외")
                 startActivity(it)
             }
         }
