@@ -171,9 +171,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun moveToSearch(word: String) {
         Intent(this@MainActivity, PlaceListActivity::class.java).let {
-        it.putExtra("QUERY", word)
-        startActivity(it)
-    }
+            it.putExtra("QUERY", word)
+            startActivity(it)
+        }
 
     }
 

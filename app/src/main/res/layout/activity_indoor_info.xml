@@ -14,12 +14,10 @@
             sothree:umanoPanelHeight="180dp"
             sothree:umanoShadowHeight="6dp">
 
-        <TextView
+        <RelativeLayout
+                android:id="@+id/map_view_info"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="MAP"
-                android:textSize="16dp" />
+                android:layout_height="match_parent"/>
 
         <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"

@@ -4,18 +4,23 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import com.mobal.hangvigation.R
 import com.mobal.hangvigation.model.GetInfoResponse
 import com.mobal.hangvigation.model.GetInfoResponseData
 import com.mobal.hangvigation.network.ApplicationController
 import com.mobal.hangvigation.network.NetworkService
 import kotlinx.android.synthetic.main.activity_indoor_info.*
+import net.daum.mf.map.api.MapPOIItem
+import net.daum.mf.map.api.MapPoint
+import net.daum.mf.map.api.MapView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class IndoorInfoActivity : AppCompatActivity() {
     private var networkService : NetworkService = ApplicationController.instance.networkService
+    private lateinit var mapView : MapView
     private var placeIdx : Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +30,24 @@ class IndoorInfoActivity : AppCompatActivity() {
         placeIdx = intent.getIntExtra("INDOOR_PLACE_IDX", 1)
 
         communication()
+        setMapView()
+    }
+
+    private fun setMapView() {
+
+        mapView = MapView(this)
+        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(37.600577, 126.864837), 1, true)
+        val mapViewContainer = map_view_info as ViewGroup
+        mapViewContainer.addView(mapView)
+
+        mapView.removeAllPOIItems()
+        val marker = MapPOIItem()
+        marker.itemName = "전자관"
+        marker.tag = 1
+        marker.mapPoint = MapPoint.mapPointWithGeoCoord(37.600577, 126.864837)// 전자관
+        marker.markerType = MapPOIItem.MarkerType.CustomImage
+        marker.customImageResourceId = R.drawable.indoor_location
+        mapView.addPOIItem(marker)
     }
 
     private fun communication() {
@@ -44,6 +67,7 @@ class IndoorInfoActivity : AppCompatActivity() {
     }
 
     private fun setInfoUI(data: GetInfoResponseData) {
+        // TODO
         tv_name_indoor_info.text = data.name?: "${data.building} ${data.num}호"
         tv_position_indoor_info.text = "${data.building} ${data.floor} ${data.num}호"
         if (data.tag1!=null) {
