@@ -1,17 +1,24 @@
 package com.mobal.hangvigation.ui.main
 
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import com.mobal.hangvigation.ui.indoor_info.PlaceListActivity
-import com.mobal.hangvigation.R
 import com.mobal.hangvigation.ui.indoor_navi.IndoorMapActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import net.daum.mf.map.api.MapView
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
+import android.content.pm.PackageManager
+import android.os.Build
+import android.support.annotation.NonNull
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.util.Log
+import com.mobal.hangvigation.R
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +35,16 @@ class MainActivity : AppCompatActivity() {
     private val MARKER_POINT_RESEARCH = MapPoint.mapPointWithGeoCoord(37.597566, 126.864749)// 연구동
     private val MARKER_POINT_RESIDENCE = MapPoint.mapPointWithGeoCoord(37.598137, 126.866190)// 기숙사
     private lateinit var mapView : MapView
+    private var permissions = arrayOf(ACCESS_FINE_LOCATION)
+
+    override fun onStart() {
+        super.onStart()
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!checkPermissions()) {
+                finish()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +75,29 @@ class MainActivity : AppCompatActivity() {
         marker.markerType = MapPOIItem.MarkerType.CustomImage
         marker.customImageResourceId = R.drawable.marker_science
         mapView.addPOIItem(marker)
+        mapView.setPOIItemEventListener(object : MapView.POIItemEventListener {
+            override fun onPOIItemSelected(mapView: MapView, mapPOIItem: MapPOIItem) {
+
+            }
+
+            override fun onCalloutBalloonOfPOIItemTouched(
+                p0: MapView?,
+                p1: MapPOIItem?,
+                p2: MapPOIItem.CalloutBalloonButtonType?
+            ) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+
+        })
 
         val marker2 = MapPOIItem()
         marker2.itemName = "안내 시작"
@@ -165,7 +205,7 @@ class MainActivity : AppCompatActivity() {
         // 실내 장소 카테고리 버튼 관리
         // 강의실
         btn_first_main.setOnClickListener {
-//            Intent(this, PlaceListActivity::class.java).let {
+            //            Intent(this, PlaceListActivity::class.java).let {
 //                it.putExtra("DIVISION_IDX", 2)
 //                startActivity(it)
 //            }
@@ -196,8 +236,49 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // 현재 위치 버튼 관리
 //        btn_location_main.setOnClickListener {
 //            mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading
 //        }
     }
+
+    /* Location permission 을 위한 메서드들 */
+    private fun checkPermissions(): Boolean {
+        var result: Int
+        val listPermissionsNeeded = ArrayList<String>()
+        for (p in permissions) {
+            result = ContextCompat.checkSelfPermission(this@MainActivity, p)
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(p)
+            }
+        }
+        if (listPermissionsNeeded.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this@MainActivity,
+                listPermissionsNeeded.toTypedArray(),
+                REQUEST_ACCESS_FINE_LOCATION
+            )
+            return false
+        }
+        return true
+    }
+    override fun onRequestPermissionsResult(requestCode: Int, @NonNull permissions: Array<String>, @NonNull grantResults: IntArray) {
+        when (requestCode) {
+            REQUEST_ACCESS_FINE_LOCATION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("permission", "granted")
+                }
+            }
+        }
+    }
+    companion object {
+        /* Location permission 을 위한 필드 */
+        const val REQUEST_ACCESS_FINE_LOCATION = 10 // code you want.
+    }
 }
+
+// TODO
+// 마커 선택 -> 요약 뷰
+// 요약 뷰 개발
+// 요약뷰 '안내 시작' -> 실외 내비로 전환
+// 현재 위치 버튼 -> 화면이 고정될 수 있도록
