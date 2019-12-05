@@ -21,7 +21,7 @@ import android.util.Log
 import com.mobal.hangvigation.R
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
     private val MARKER_POINT_SCIENCE = MapPoint.mapPointWithGeoCoord(37.601532, 126.865048) // 과학관
     private val MARKER_POINT_MECHANICAL = MapPoint.mapPointWithGeoCoord(37.601122, 126.864429)// 기계관
     private val MARKER_POINT_ELECTRONIC = MapPoint.mapPointWithGeoCoord(37.600577, 126.864837)// 전자관
@@ -50,18 +50,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 디버그 키 얻기
-//        val packageInfo = Utility.getPackageInfo(this, PackageManager.GET_SIGNATURES)
-//        for (signature in packageInfo.signatures) {
-//            try {
-//                val md = MessageDigest.getInstance("SHA")
-//                md.update(signature.toByteArray())
-//                Log.d("asd", Base64.encodeToString(md.digest(), Base64.NO_WRAP))
-//            } catch (e: NoSuchAlgorithmException) {
-////                Log.w(FragmentActivity.TAG, "Unable to get MessageDigest. signature=$signature", e)
-//            }
-//        }
-
+        // 맵 띄우기
         mapView = MapView(this)
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(37.600459, 126.865486), 1, true)
         val mapViewContainer = map_view_main as ViewGroup
@@ -75,29 +64,7 @@ class MainActivity : AppCompatActivity() {
         marker.markerType = MapPOIItem.MarkerType.CustomImage
         marker.customImageResourceId = R.drawable.marker_science
         mapView.addPOIItem(marker)
-        mapView.setPOIItemEventListener(object : MapView.POIItemEventListener {
-            override fun onPOIItemSelected(mapView: MapView, mapPOIItem: MapPOIItem) {
-
-            }
-
-            override fun onCalloutBalloonOfPOIItemTouched(
-                p0: MapView?,
-                p1: MapPOIItem?,
-                p2: MapPOIItem.CalloutBalloonButtonType?
-            ) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-
-        })
+        mapView.setPOIItemEventListener(this)
 
         val marker2 = MapPOIItem()
         marker2.itemName = "안내 시작"
@@ -190,6 +157,33 @@ class MainActivity : AppCompatActivity() {
         setClickListener()
     }
 
+    /* 마커 터치 관련 메서드들 */
+    override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
+        cl_second_main.visibility = View.GONE
+        cl_search_main.visibility = View.GONE
+        cl_summary_main.visibility = View.VISIBLE
+
+        mapView.removeAllPOIItems() // 모든 마커 지우기
+//        mapView.fitMapViewAreaToShowAllPOIItems() // 모든 마커를 보여줌
+
+        /* TODO
+             * 소요시간, 도보로 이동할 거리 띄우기
+             * Tmap에서 경로 정보만 받아와서
+             * 맵 위에 polyline 그리기
+             */
+
+        setClickListener() // 안내 시작 버튼 클릭
+
+
+    }
+
+    override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?, p2: MapPOIItem.CalloutBalloonButtonType?) {
+    }
+    override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
+    }
+    override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
+    }
+
     private fun setClickListener() {
         // 검색 버튼 관련 VISIBILITY 관리
         iv_search_main.setOnClickListener {
@@ -205,14 +199,14 @@ class MainActivity : AppCompatActivity() {
         // 실내 장소 카테고리 버튼 관리
         // 강의실
         btn_first_main.setOnClickListener {
-            //            Intent(this, PlaceListActivity::class.java).let {
-//                it.putExtra("DIVISION_IDX", 2)
-//                startActivity(it)
-//            }
-
-            Intent(this, IndoorMapActivity::class.java).let {
+            Intent(this, PlaceListActivity::class.java).let {
+                it.putExtra("DIVISION_IDX", 2)
                 startActivity(it)
             }
+
+//            Intent(this, IndoorMapActivity::class.java).let {
+//                startActivity(it)
+//            }
         }
         // 편의시설
         btn_second_main.setOnClickListener {
@@ -236,12 +230,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // 안내 시작 버튼 관리
+        btn_start_summary.setOnClickListener {
+            /* TODO
+                 * 실외 네비
+                 */
+        }
+
         // 현재 위치 버튼 관리
 //        btn_location_main.setOnClickListener {
 //            mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading
 //        }
     }
 
+    // 현재 위치 잡으려면 또 퍼미션 필요하다해서 추가함
     /* Location permission 을 위한 메서드들 */
     private fun checkPermissions(): Boolean {
         var result: Int
@@ -276,9 +278,8 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_ACCESS_FINE_LOCATION = 10 // code you want.
     }
 }
-
-// TODO
-// 마커 선택 -> 요약 뷰
-// 요약 뷰 개발
-// 요약뷰 '안내 시작' -> 실외 내비로 전환
-// 현재 위치 버튼 -> 화면이 고정될 수 있도록
+/* TODO
+     * 마커들 클래스로 묶을 수 있으면 묶기
+     * 현재 위치 버튼 -> 화면이 고정될 수 있도록
+     * (참고) api 메서드 사용: https://github.com/sesna99/BusComplain2/blob/d85ab8fff00b1f8b0c34d92b39cb85705f8ab3cc/app/src/main/java/trycatch/dev/buscomplain/View/Activity/SearchDetailActivity.kt
+     */
