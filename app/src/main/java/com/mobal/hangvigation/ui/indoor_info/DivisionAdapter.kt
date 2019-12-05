@@ -21,11 +21,13 @@ class DivisionAdapter(private val context: Context, private var divisionItems: A
     override fun getItemCount(): Int = divisionItems.size
 
     override fun onBindViewHolder(holder: DivisionViewHolder, position: Int) {
-        holder.division_btn.setOnClickListener {
+        holder.division_tv.text = divisionItems[position].name
+
+        holder.division_tv.setOnClickListener {
             Intent(context, PlaceListActivity::class.java).let {
                 it.putExtra("DIVISION_IDX", divisionItems[position].division_idx)
 
-                if ((context as PlaceListActivity).title.contains("::"))
+                if (!(context as PlaceListActivity).title.contains("::"))
                     it.putExtra("TITLE", context.title + " :: ${divisionItems[position].name}")
                 else
                     it.putExtra("TITLE", context.title + " - ${divisionItems[position].name}")

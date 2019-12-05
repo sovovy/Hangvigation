@@ -101,15 +101,15 @@ class PlaceListActivity : AppCompatActivity() {
     }
 
     private fun invisibleDivisionUI() {
-        view_bottom_place_list.visibility = View.INVISIBLE
-        rv_top_division.visibility = View.INVISIBLE
-        tv_center_place_list.visibility = View.INVISIBLE
-        iv_center_place_list.visibility = View.INVISIBLE
+        view_bottom_place_list.visibility = View.GONE
+        rv_top_division.visibility = View.GONE
+        tv_center_place_list.visibility = View.GONE
+        iv_center_place_list.visibility = View.GONE
     }
 
     private fun setNoPlaceUI(guide: String) {
-        view_bottom_place_list.visibility = View.INVISIBLE
-        rv_top_division.visibility = View.INVISIBLE
+        view_bottom_place_list.visibility = View.GONE
+        rv_top_division.visibility = View.GONE
         tv_center_place_list.text = guide
     }
 }

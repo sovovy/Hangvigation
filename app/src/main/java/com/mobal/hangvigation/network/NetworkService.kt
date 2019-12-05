@@ -16,4 +16,7 @@ interface NetworkService {
 
     @GET("/indoor/search")
     fun getSearch(@Query("q") query: String): Call<GetDivisionResponse>
+
+    @GET("/indoor/info/{indoorPlaceIdx}")
+    fun getInfo(@Path("indoorPlaceIdx") indoorPlaceIdx: Int): Call<GetInfoResponse>
 }
