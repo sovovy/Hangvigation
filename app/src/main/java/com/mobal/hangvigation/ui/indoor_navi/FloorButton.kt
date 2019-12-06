@@ -9,14 +9,20 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import com.mobal.hangvigation.R
+import com.mobal.hangvigation.ui.summary.IndoorSummaryActivity
 import kotlinx.android.synthetic.main.floor_button.view.*
+import java.lang.ClassCastException
 
 class FloorButton(context: Context?, attrs: AttributeSet?) : ConstraintLayout(context, attrs),View.OnClickListener {
     private var bg_click = false
 
     override fun onClick(v: View?) {
         changeBg()
-        (context as IndoorNaviActivity).lastChange(tv_floor_flbtn.text.toString()[0].toString().toInt())
+        try {
+            (context as IndoorSummaryActivity).lastChange(tv_floor_flbtn.text.toString()[0].toString().toInt())
+        } catch (e: ClassCastException) {
+            (context as IndoorNaviActivity).lastChange(tv_floor_flbtn.text.toString()[0].toString().toInt())
+        }
     }
 
     fun changeBg(){

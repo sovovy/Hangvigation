@@ -77,7 +77,7 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     private fun setSummary(idx: Int) {
         rl_floor_summary.visibility = View.GONE
         sv_horizon_summary.visibility = View.GONE
-        tv_title_summary.text = "${markerName[idx]}까지"
+        tv_title_summary.text = markerName[idx]
 
         /* TODO
          * 소요시간, 도보로 이동할 거리 띄우기

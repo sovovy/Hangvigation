@@ -18,6 +18,7 @@
         <activity android:name=".ui.indoor_info.IndoorInfoActivity"/>
         <activity android:name=".ui.indoor_info.PlaceListActivity"/>
         <activity android:name=".ui.summary.OutdoorSummaryActivity"/>
+        <activity android:name=".ui.summary.IndoorSummaryActivity"/>
         <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
