@@ -13,7 +13,7 @@
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="d42ec019b2368947ef91a02b0a580ed9"/>
-        <activity android:name=".ui.indoor_navi.IndoorMapActivity">
+        <activity android:name=".ui.indoor_navi.IndoorNaviActivity">
         </activity>
         <activity android:name=".ui.indoor_info.IndoorInfoActivity"/>
         <activity android:name=".ui.indoor_info.PlaceListActivity"/>

@@ -16,7 +16,7 @@ class FloorButton(context: Context?, attrs: AttributeSet?) : ConstraintLayout(co
 
     override fun onClick(v: View?) {
         changeBg()
-        (context as IndoorMapActivity).lastChange(tv_floor_flbtn.text.toString()[0].toString().toInt())
+        (context as IndoorNaviActivity).lastChange(tv_floor_flbtn.text.toString()[0].toString().toInt())
     }
 
     fun changeBg(){

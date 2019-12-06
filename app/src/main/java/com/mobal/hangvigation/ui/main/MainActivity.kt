@@ -163,10 +163,6 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
                 it.putExtra("TITLE", "강의실")
                 startActivity(it)
             }
-
-//            Intent(this, IndoorMapActivity::class.java).let {
-//                startActivity(it)
-//            }
         }
         // 편의시설
         btn_second_main.setOnClickListener {

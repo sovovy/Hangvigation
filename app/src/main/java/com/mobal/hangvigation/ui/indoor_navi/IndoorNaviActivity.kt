@@ -26,7 +26,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.lang.IllegalArgumentException
 
-class IndoorMapActivity : AppCompatActivity() {
+class IndoorNaviActivity : AppCompatActivity() {
     private var accessPoints: ArrayList<AccessPoint> = ArrayList()
     private lateinit var networkService: NetworkService
     private var wifiManager: WifiManager? = null
@@ -281,14 +281,14 @@ class IndoorMapActivity : AppCompatActivity() {
         var result: Int
         val listPermissionsNeeded = ArrayList<String>()
         for (p in permissions) {
-            result = ContextCompat.checkSelfPermission(this@IndoorMapActivity, p)
+            result = ContextCompat.checkSelfPermission(this@IndoorNaviActivity, p)
             if (result != PackageManager.PERMISSION_GRANTED) {
                 listPermissionsNeeded.add(p)
             }
         }
         if (listPermissionsNeeded.isNotEmpty()) {
             ActivityCompat.requestPermissions(
-                this@IndoorMapActivity,
+                this@IndoorNaviActivity,
                 listPermissionsNeeded.toTypedArray(),
                 MULTIPLE_PERMISSIONS
             )

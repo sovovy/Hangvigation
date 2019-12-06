@@ -1,5 +1,6 @@
 package com.mobal.hangvigation.ui.indoor_info
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import com.mobal.hangvigation.model.GetInfoResponse
 import com.mobal.hangvigation.model.GetInfoResponseData
 import com.mobal.hangvigation.network.ApplicationController
 import com.mobal.hangvigation.network.NetworkService
+import com.mobal.hangvigation.ui.indoor_navi.IndoorNaviActivity
 import kotlinx.android.synthetic.main.activity_indoor_info.*
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
@@ -119,6 +121,9 @@ class IndoorInfoActivity : AppCompatActivity() {
 
         btn_guide_info.setOnClickListener {
             // TODO intent indoor navi
+            Intent(this, IndoorNaviActivity::class.java).let {
+                startActivity(it)
+            }
         }
     }
 }
