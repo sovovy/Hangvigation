@@ -59,7 +59,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/view_bottom_place_list"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:paddingEnd="15dp"
+            android:paddingStart="15dp"
             android:paddingTop="8dp"
             android:clipToPadding="false"
     />

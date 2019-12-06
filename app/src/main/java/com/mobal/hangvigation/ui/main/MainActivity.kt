@@ -14,12 +14,14 @@ import net.daum.mf.map.api.MapView
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.mobal.hangvigation.R
+import com.mobal.hangvigation.ui.summary.SummaryActivity
 
 
 class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
@@ -34,10 +36,9 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
         MapPoint.mapPointWithGeoCoord(37.598968, 126.864093), MapPoint.mapPointWithGeoCoord(37.597793, 126.865940),
         MapPoint.mapPointWithGeoCoord(37.597566, 126.864749), MapPoint.mapPointWithGeoCoord(37.598137, 126.866190)
     )
-    private val markerName = arrayOf("과학관", "기계관", "전자관", "학관", "도서관", "창업보육센터", "항공우주박물관", "강의동", "본관", "학군단", "연구동", "기숙사")
+    private lateinit var mapViewContainer : ViewGroup
     private lateinit var mapView : MapView
     private var permissions = arrayOf(ACCESS_FINE_LOCATION)
-    private var mapCode = 0
     private var flag = false
 
     override fun onStart() {
@@ -52,43 +53,36 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // 맵이 필요한 4가지 경우
-        // 1. 메인, 2. summary, 3. outnavi, 4. indoor info
-        // 1,2를 제외하고 나머지 경우에서 여기로 넘어올 때 putExtra로 "MAP_CODE"를 넘겨준다 (변수 mapCode로도 값을 갖고 있는다)
-        // "MAP_CODE"는 2: summary, 3: outnavi, 4: indoor info
-
-        mapCode = intent.getIntExtra("MAP_CODE", 1)
-
-        when(mapCode){
-            // Main Map
-            1 -> {
-                // 경도 위도를 지정해 맵 띄우기
-                floatingMap(37.600459, 126.865486)
-                // idx 로 건물을 지정해 마커 띄우기
-                floatingMarker(arrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), "안내 시작")
-                // main 관련 listener 부착
-                setMainListener()
-                activeTrackingMode()
-            }
-            // Outnavi Map
-            3 -> {
-                floatingMap(37.600459, 126.865486)
-            }
-            // IndoorInfo Map
-            4 -> {
-                floatingMap(37.600459, 126.865486)
-            }
-        }
-
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        // 경도 위도를 지정해 맵 띄우기
+        floatingMap(37.600459, 126.865486)
+        // idx 로 건물을 지정해 마커 띄우기
+        floatingMarker(arrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), "안내 시작")
+        // main 관련 listener 부착
+        setListener()
+        activeTrackingMode()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapViewContainer.removeView(mapView)
+    }
+
     private fun activeTrackingMode() {
-        mapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.indoor_location,MapPOIItem.ImageOffset(30,50))
-        mapView.setCustomCurrentLocationMarkerImage(R.drawable.indoor_location,MapPOIItem.ImageOffset(30,50))
+        mapView.setShowCurrentLocationMarker(true)
+        mapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.mlocation_circle,MapPOIItem.ImageOffset(30,50))
+        mapView.setCustomCurrentLocationMarkerImage(R.drawable.mlocation_circle,MapPOIItem.ImageOffset(30,50))
+
         btn_location_main.setOnClickListener {
             if (flag) {
+                btn_location_main.background = ContextCompat.getDrawable(this, R.drawable.mlocation)
                 mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOff
             } else {
+                btn_location_main.background = ContextCompat.getDrawable(this, R.drawable.mlocation_tracking)
                 mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
             }
             flag = !flag
@@ -98,7 +92,7 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
     private fun floatingMap(lat: Double, long: Double) {
         mapView = MapView(this)
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(lat, long), 1, true)
-        val mapViewContainer = map_view_main as ViewGroup
+        mapViewContainer = map_view_main as ViewGroup
         mapViewContainer.addView(mapView)
 
         btn_school_main.setOnClickListener {
@@ -124,7 +118,7 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
         }
     }
 
-    private fun setMainListener() {
+    private fun setListener() {
         // search bar enter key event
         et_bar_search.setOnKeyListener { _, keyCode, event ->
             if ((event.action== KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
@@ -209,31 +203,10 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
 
     /* 마커 터치 관련 메서드들 */
     override fun onCalloutBalloonOfPOIItemTouched(map: MapView?, marker: MapPOIItem?) {
-        when(mapCode) {
-            // main일 땐 summary 화면으로 변환
-            1 -> {
-                cl_second_main.visibility = View.GONE
-                cl_search_main.visibility = View.GONE
-                cl_summary_main.visibility = View.VISIBLE
-                tv_title_summary.text = "${markerName[marker!!.tag]}까지"
-                mapView.setMapCenterPointAndZoomLevel(markerPoints[marker.tag], 1, true)
-                setSummaryListener() // 안내 시작 버튼 클릭
-                mapView.removeAllPOIItems() // 모든 마커 지우기
-                floatingMarker(arrayOf(marker.tag), "")
-//                mapView.fitMapViewAreaToShowAllPOIItems() // 모든 마커를 보여줌
-
-                /* TODO
-                 * 소요시간, 도보로 이동할 거리 띄우기
-                 * Tmap에서 경로 정보만 받아와서
-                 * 맵 위에 polyline 그리기
-                 */
-            }
-            // summary 일 땐 실내로 들어가는 경우에만 indoor map 으로 변환
-            2 -> {
-                // TODO indoor map 으로 변환
-            }
+        Intent(this, SummaryActivity::class.java).let {
+            it.putExtra("MARKER_IDX", marker!!.tag)
+            startActivity(it)
         }
-        // outnavi, indoor info일 땐 do nothing (일단
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?, p2: MapPOIItem.CalloutBalloonButtonType?) {
@@ -241,16 +214,6 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
     override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
     }
     override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
-    }
-
-    private fun setSummaryListener() {
-        // 안내 시작 버튼 관리
-        btn_start_summary.setOnClickListener {
-            /* TODO
-             * 실외 네비
-             */
-            mapCode = 3
-        }
     }
 
     /* Location permission 을 위한 메서드들 */
