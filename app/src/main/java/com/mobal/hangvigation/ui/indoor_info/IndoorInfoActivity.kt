@@ -95,9 +95,14 @@ class IndoorInfoActivity : AppCompatActivity() {
     }
 
     private fun setInfoUI(data: GetInfoResponseData) {
-        // TODO name format
         tv_name_indoor_info.text = data.name?: "${data.building} ${data.num}호"
-        tv_position_indoor_info.text = "${data.building} ${data.floor} ${data.num}호"
+
+        if (data.name!=null && data.num!=null) {
+            tv_position_indoor_info.text = "${data.building} ${data.floor} ${data.num}호"
+        } else {
+            tv_position_indoor_info.text = "${data.building} ${data.floor}"
+        }
+
         if (data.tag1!=null) {
             tv_tag1_indoor_info.text = data.tag1
             tv_tag1_indoor_info.visibility = View.VISIBLE

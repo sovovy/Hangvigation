@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
         super.onResume()
 
         // 경도 위도를 지정해 맵 띄우기
-        floatingMap(37.600459, 126.865486)
+        floatingMap(37.599759, 126.865486)
         // idx 로 건물을 지정해 마커 띄우기
         floatingMarker(arrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), "안내 시작")
         // main 관련 listener 부착
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
         mapViewContainer.addView(mapView)
 
         btn_school_main.setOnClickListener {
-            mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(37.600459, 126.865486), 1, true)
+            mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(37.599759, 126.865486), 1, true)
         }
     }
 
