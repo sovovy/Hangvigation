@@ -14,14 +14,13 @@ import net.daum.mf.map.api.MapView
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Build
 import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.mobal.hangvigation.R
-import com.mobal.hangvigation.ui.summary.SummaryActivity
+import com.mobal.hangvigation.ui.summary.OutdoorSummaryActivity
 
 
 class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
@@ -74,8 +73,8 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
 
     private fun activeTrackingMode() {
         mapView.setShowCurrentLocationMarker(true)
-        mapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.mlocation_circle,MapPOIItem.ImageOffset(30,50))
-        mapView.setCustomCurrentLocationMarkerImage(R.drawable.mlocation_circle,MapPOIItem.ImageOffset(30,50))
+        mapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.mlocation_circle,MapPOIItem.ImageOffset(32,32))
+        mapView.setCustomCurrentLocationMarkerImage(R.drawable.mlocation_circle,MapPOIItem.ImageOffset(32,32))
 
         btn_location_main.setOnClickListener {
             if (flag) {
@@ -200,7 +199,7 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
 
     /* 마커 터치 관련 메서드들 */
     override fun onCalloutBalloonOfPOIItemTouched(map: MapView?, marker: MapPOIItem?) {
-        Intent(this, SummaryActivity::class.java).let {
+        Intent(this, OutdoorSummaryActivity::class.java).let {
             it.putExtra("MARKER_IDX", marker!!.tag)
             startActivity(it)
         }

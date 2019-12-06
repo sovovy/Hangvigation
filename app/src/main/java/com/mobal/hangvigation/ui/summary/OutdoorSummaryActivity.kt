@@ -2,6 +2,7 @@ package com.mobal.hangvigation.ui.summary
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import com.mobal.hangvigation.R
 import kotlinx.android.synthetic.main.activity_summary.*
@@ -9,7 +10,7 @@ import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 
-class SummaryActivity : AppCompatActivity(), MapView.POIItemEventListener {
+class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener {
     // idx별 건물
     // 0: 과학관, 1: 기계관, 2: 전자관, 3: 학관, 4: 도서관, 5: 창업보육센터 6: 항공우주박물관
     // 7: 강의동, 8: 본관, 9: 학군단, 10: 연구동, 11: 기숙사
@@ -74,6 +75,8 @@ class SummaryActivity : AppCompatActivity(), MapView.POIItemEventListener {
     }
 
     private fun setSummary(idx: Int) {
+        rl_floor_summary.visibility = View.GONE
+        sv_horizon_summary.visibility = View.GONE
         tv_title_summary.text = "${markerName[idx]}까지"
 
         /* TODO
