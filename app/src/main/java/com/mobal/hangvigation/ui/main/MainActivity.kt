@@ -29,12 +29,12 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
     // 0: 과학관, 1: 기계관, 2: 전자관, 3: 학관, 4: 도서관, 5: 창업보육센터 6: 항공우주박물관
     // 7: 강의동, 8: 본관, 9: 학군단, 10: 연구동, 11: 기숙사
     private val markerPoints: Array<MapPoint> = arrayOf(
-        MapPoint.mapPointWithGeoCoord(37.601532, 126.865048), MapPoint.mapPointWithGeoCoord(37.601122, 126.864429),
-        MapPoint.mapPointWithGeoCoord(37.600577, 126.864837), MapPoint.mapPointWithGeoCoord(37.600058, 126.864689),
-        MapPoint.mapPointWithGeoCoord(37.597992, 126.864422), MapPoint.mapPointWithGeoCoord(37.597841, 126.865128),
-        MapPoint.mapPointWithGeoCoord(37.599832, 126.865557), MapPoint.mapPointWithGeoCoord(37.600067, 126.866707),
-        MapPoint.mapPointWithGeoCoord(37.598968, 126.864093), MapPoint.mapPointWithGeoCoord(37.597793, 126.865940),
-        MapPoint.mapPointWithGeoCoord(37.597566, 126.864749), MapPoint.mapPointWithGeoCoord(37.598137, 126.866190)
+        MapPoint.mapPointWithGeoCoord(37.60161074286123, 126.86512165734828), MapPoint.mapPointWithGeoCoord(37.601213581669576, 126.86448821597422),
+        MapPoint.mapPointWithGeoCoord(37.60061718974406, 126.8649366022691), MapPoint.mapPointWithGeoCoord(37.60006729180758, 126.86467997345024),
+        MapPoint.mapPointWithGeoCoord(37.598143454113874, 126.8644852913131), MapPoint.mapPointWithGeoCoord(37.59793706630939, 126.86521887909963),
+        MapPoint.mapPointWithGeoCoord(37.599712420491066, 126.8655723834837), MapPoint.mapPointWithGeoCoord(37.600182036444735, 126.86654258017211),
+        MapPoint.mapPointWithGeoCoord(37.598999067816706, 126.86420064147649), MapPoint.mapPointWithGeoCoord(37.59786575148311, 126.86588993989628),
+        MapPoint.mapPointWithGeoCoord(37.59760323103674, 126.86480899679448), MapPoint.mapPointWithGeoCoord(37.59816840394317, 126.866614119594)
     )
     private lateinit var mapViewContainer : ViewGroup
     private lateinit var mapView : MapView
@@ -114,6 +114,7 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
             marker.mapPoint = markerPoints[i]
             marker.markerType = MapPOIItem.MarkerType.CustomImage
             marker.customImageResourceId = markerImgs[i]
+            marker.setCustomImageAnchor(0.5f, 0.5f)
             mapView.addPOIItem(marker)
         }
     }
