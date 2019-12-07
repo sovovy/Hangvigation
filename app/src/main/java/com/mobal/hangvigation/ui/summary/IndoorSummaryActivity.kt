@@ -38,7 +38,6 @@ class IndoorSummaryActivity : AppCompatActivity(){
     lateinit var mapView : InnerMapView
     private var lastFloor = 0
     val mRoute = HashMap<Int, FloatArray>()
-    var flagReceiver = false
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -47,7 +46,6 @@ class IndoorSummaryActivity : AppCompatActivity(){
                 if (action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                     getWIFIScanResult()
                     wifiManager!!.startScan()
-                    flagReceiver = true
                 } else if (action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
                     context.sendBroadcast(Intent("wifi.ON_NETWORK_STATE_CHANGED"))
                 }
@@ -77,32 +75,6 @@ class IndoorSummaryActivity : AppCompatActivity(){
         initWIFIScan()
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        initWIFIScan()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        initWIFIScan()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (flagReceiver) {
-            unregisterReceiver(mWifiScanReceiver)
-            flagReceiver = false
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (flagReceiver) {
-            unregisterReceiver(mWifiScanReceiver)
-            flagReceiver = false
-        }
-    }
-
     private fun init() {
         map_view_summary.visibility = View.GONE
 
@@ -130,20 +102,9 @@ class IndoorSummaryActivity : AppCompatActivity(){
             3 -> fl_3_summary.performClick()
             4 -> fl_4_summary.performClick()
         }
+        // TODO change
 //        networkRoute(x, y, z)
-        //////////////////////////// TEST
-        setTextUI(distance = 10)
-        setListener()
-        val tmp =
-            arrayListOf(PostRouteResponseData(18, 5, 3), PostRouteResponseData(18, 9, 3),
-                PostRouteResponseData(18, 12, 3), PostRouteResponseData(18, 16, 3),
-                PostRouteResponseData(18, 22, 3), PostRouteResponseData(18, 25, 3),
-                PostRouteResponseData(18, 33, 3), PostRouteResponseData(17, 33, 3),
-                PostRouteResponseData(18, 22, 4), PostRouteResponseData(18, 75, 4),
-                PostRouteResponseData(15, 75, 4))
-        responseToRoute(tmp)
-        mapView.route = mRoute[lastFloor]?:mRoute[3]!!
-        ////////////////////////////
+        networkRoute(18, 5, 3)
     }
 
     private fun setMapView(initF: Int, y: Int) {
@@ -159,8 +120,11 @@ class IndoorSummaryActivity : AppCompatActivity(){
     }
 
     private fun networkRoute(x: Int, y: Int, z: Int) {
-        // TODO 도착지 좌표값 intent로 받아오기
-        val postRoute = networkService.postRoute(PostRouteData(x, y, z, 17, 33, 3))
+        val postRoute = networkService.postRoute(PostRouteData(x, y, z,
+                intent.getIntExtra("X", 18),
+                intent.getIntExtra("Y", 33),
+                intent.getIntExtra("Z", 3))
+        )
 
         postRoute.enqueue(object : Callback<PostRouteResponse> {
             override fun onFailure(call: Call<PostRouteResponse>?, t: Throwable?) {
@@ -190,6 +154,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
     private fun setListener() {
         btn_start_summary.setOnClickListener {
             Intent(this, IndoorNaviActivity::class.java).let{
+                // TODO intent route info
                 startActivity(it)
                 finish()
             }
@@ -234,7 +199,8 @@ class IndoorSummaryActivity : AppCompatActivity(){
         postCoord.enqueue(object : Callback<PostCoordResponse> {
             override fun onFailure(call: Call<PostCoordResponse>?, t: Throwable?) {
                 Log.d("COORD_FAIL", t.toString())
-
+                // TODO DELETE
+                setRoute(18, 5, 3)
             }
 
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
@@ -305,7 +271,6 @@ class IndoorSummaryActivity : AppCompatActivity(){
             postRssiData.add(PostCoordData(it.bssid, it.rssi))
         }
         unregisterReceiver(mWifiScanReceiver)
-        flagReceiver = false
         networkCoord(postRssiData)
     }
 
