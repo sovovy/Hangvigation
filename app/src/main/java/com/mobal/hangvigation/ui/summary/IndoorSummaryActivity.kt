@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.activity_summary.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.pow
 
 class IndoorSummaryActivity : AppCompatActivity(){
     private var accessPoints: ArrayList<AccessPoint> = ArrayList()
@@ -63,6 +64,8 @@ class IndoorSummaryActivity : AppCompatActivity(){
 
         init()
 
+        // TODO DELETE
+        setRoute(18, 5, 3)
     }
 
     override fun onStart() {
@@ -134,9 +137,24 @@ class IndoorSummaryActivity : AppCompatActivity(){
             override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
                 if(response!!.isSuccessful){
                     // TODO 거리 구하기. 계단은 3m
-                    setTextUI(10)
-                    setListener()
-                    responseToRoute(response.body().data)
+                    val data = response.body().data
+                    var prevX = data[0].x
+                    var prevY = data[0].y
+                    var prevZ = data[0].z
+                    var len = 0.0
+                    data.forEach {
+                        len += if (prevZ!=it.z)
+                            3.0
+                        else
+                            ((prevX - it.x).toDouble().pow(2) + (prevY - it.y).toDouble().pow(2)).pow(0.5)
+
+                        prevX = it.x
+                        prevY = it.y
+                        prevZ = it.z
+                    }
+                    setTextUI(len)
+                    setListener(data)
+                    responseToRoute(data)
                     mapView.route = mRoute[lastFloor]?:mRoute[3]!!
 
                 } else{
@@ -146,15 +164,15 @@ class IndoorSummaryActivity : AppCompatActivity(){
         })
     }
 
-    private fun setTextUI(distance: Int) {
+    private fun setTextUI(distance: Double) {
         tv_time_summary.text = "${(distance/1.389).toInt()}초"
-        tv_distance_summary.text = "${distance}m"
+        tv_distance_summary.text = "${distance.toInt()}m"
     }
 
-    private fun setListener() {
+    private fun setListener(route: ArrayList<PostRouteResponseData>) {
         btn_start_summary.setOnClickListener {
             Intent(this, IndoorNaviActivity::class.java).let{
-                // TODO intent route info
+                it.putExtra("ROUTE", route)
                 startActivity(it)
                 finish()
             }
@@ -199,8 +217,6 @@ class IndoorSummaryActivity : AppCompatActivity(){
         postCoord.enqueue(object : Callback<PostCoordResponse> {
             override fun onFailure(call: Call<PostCoordResponse>?, t: Throwable?) {
                 Log.d("COORD_FAIL", t.toString())
-                // TODO DELETE
-                setRoute(18, 5, 3)
             }
 
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {

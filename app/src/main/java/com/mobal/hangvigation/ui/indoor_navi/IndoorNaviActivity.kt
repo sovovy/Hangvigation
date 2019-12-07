@@ -103,33 +103,11 @@ class IndoorNaviActivity : AppCompatActivity() {
             wifiManager!!.startScan()
         }
 
-        mapView = InnerMapView(
-            this,
-            BitmapFactory.decodeResource(resources, R.drawable.f3),
-            sv_vertical
-        )
-        prt.addView(mapView)
-
-        btn_location.setOnClickListener {
-            mapView.moveScreen()
-        }
-
         // 네트워크
         networkService = ApplicationController.instance.networkService
 
         // route communication
-//        networkRoute()
-        val tmp =
-            arrayListOf(PostRouteResponseData(18, 5, 3), PostRouteResponseData(18, 9, 3),
-                PostRouteResponseData(18, 12, 3), PostRouteResponseData(18, 16, 3),
-                PostRouteResponseData(18, 22, 3), PostRouteResponseData(18, 25, 3),
-                PostRouteResponseData(18, 33, 3), PostRouteResponseData(17, 33, 3),
-                PostRouteResponseData(18, 22, 4), PostRouteResponseData(18, 75, 4),
-                        PostRouteResponseData(15, 75, 4))
-        responseToRoute(tmp)
-        mapView.route = mRoute[lastFloor]?:mRoute[3]!!
-        // current location's floor
-        fl_3.performClick()
+        setRoute()
     }
 
     fun lastChange(f: Int) {
@@ -183,27 +161,28 @@ class IndoorNaviActivity : AppCompatActivity() {
         })
     }
 
-    private fun networkRoute() {
+    private fun setRoute() {
+        val route = intent.getParcelableArrayListExtra<PostRouteResponseData>("ROUTE")
+        responseToRoute(route)
 
-        val postRoute = networkService.postRoute(PostRouteData(18, 5, 3, 17, 33, 3))
+        var floorImg = arrayOf(R.drawable.f1, R.drawable.f2, R.drawable.f3, R.drawable.f4)
+        mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, floorImg[route[0].z-1]), sv_vertical)
+        prt.addView(mapView)
 
-        postRoute.enqueue(object : Callback<PostRouteResponse> {
-            override fun onFailure(call: Call<PostRouteResponse>?, t: Throwable?) {
-                Log.d("ROUTE_FAIL", t.toString())
-            }
+        // set mapView route
+        mapView.route = mRoute[route[0].z]?:mRoute[4]!!
 
-            override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
-                if(response!!.isSuccessful){
-                    responseToRoute(response.body().data)
-                    mapView.route = mRoute[lastFloor]?:mRoute[3]!!
+        // current location's floor
+        when (route[0].z) {
+            1 -> fl_1.performClick()
+            2 -> fl_2.performClick()
+            3 -> fl_3.performClick()
+            4 -> fl_4.performClick()
+        }
 
-                } else{
-                    Log.d("ROUTE_UNSUCCESSFUL", response.message())
-                }
-            }
-
-        })
-
+        btn_location.setOnClickListener {
+            mapView.moveScreen()
+        }
     }
 
     private fun responseToRoute(res: ArrayList<PostRouteResponseData>) {
