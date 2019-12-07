@@ -28,7 +28,6 @@ import kotlinx.android.synthetic.main.activity_summary.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.lang.IllegalArgumentException
 
 class IndoorSummaryActivity : AppCompatActivity(){
     private var accessPoints: ArrayList<AccessPoint> = ArrayList()
@@ -39,6 +38,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
     lateinit var mapView : InnerMapView
     private var lastFloor = 0
     val mRoute = HashMap<Int, FloatArray>()
+    var flagReceiver = false
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -47,6 +47,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
                 if (action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                     getWIFIScanResult()
                     wifiManager!!.startScan()
+                    flagReceiver = true
                 } else if (action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
                     context.sendBroadcast(Intent("wifi.ON_NETWORK_STATE_CHANGED"))
                 }
@@ -88,15 +89,17 @@ class IndoorSummaryActivity : AppCompatActivity(){
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(mWifiScanReceiver)
+        if (flagReceiver) {
+            unregisterReceiver(mWifiScanReceiver)
+            flagReceiver = false
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        try {
+        if (flagReceiver) {
             unregisterReceiver(mWifiScanReceiver)
-        } catch (e: IllegalArgumentException) {
-            e.printStackTrace()
+            flagReceiver = false
         }
     }
 
@@ -116,10 +119,6 @@ class IndoorSummaryActivity : AppCompatActivity(){
             if (!wifiManager!!.isWifiEnabled) {
                 wifiManager!!.isWifiEnabled = true
             }
-            val filter = IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-            filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION)
-            registerReceiver(mWifiScanReceiver, filter)
-            wifiManager!!.startScan()
         }
     }
 
@@ -160,7 +159,8 @@ class IndoorSummaryActivity : AppCompatActivity(){
     }
 
     private fun networkRoute(x: Int, y: Int, z: Int) {
-        val postRoute = networkService.postRoute(PostRouteData(18, 5, 3, 17, 33, 3))
+        // TODO 도착지 좌표값 intent로 받아오기
+        val postRoute = networkService.postRoute(PostRouteData(x, y, z, 17, 33, 3))
 
         postRoute.enqueue(object : Callback<PostRouteResponse> {
             override fun onFailure(call: Call<PostRouteResponse>?, t: Throwable?) {
@@ -169,7 +169,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
 
             override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
                 if(response!!.isSuccessful){
-                    // TODO 거리 구하기
+                    // TODO 거리 구하기. 계단은 3m
                     setTextUI(10)
                     setListener()
                     responseToRoute(response.body().data)
@@ -305,6 +305,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
             postRssiData.add(PostCoordData(it.bssid, it.rssi))
         }
         unregisterReceiver(mWifiScanReceiver)
+        flagReceiver = false
         networkCoord(postRssiData)
     }
 
