@@ -11,6 +11,9 @@ interface NetworkService {
     @POST("/route")
     fun postRoute(@Body coords: PostRouteData): Call<PostRouteResponse>
 
+    @POST("/outdoor")
+    fun postOutdoor(@Body outdoor : PostOutdoorData): Call<PostOutdoorResponse>
+
     @GET("/indoor/division/{divisionIdx}")
     fun getDivision(@Path("divisionIdx") divisionIdx: Int): Call<GetDivisionResponse>
 

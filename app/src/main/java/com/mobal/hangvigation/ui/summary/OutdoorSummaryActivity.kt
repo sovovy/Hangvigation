@@ -1,16 +1,28 @@
 package com.mobal.hangvigation.ui.summary
 
+import android.content.Intent
+import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.mobal.hangvigation.R
+import com.mobal.hangvigation.model.*
+import com.mobal.hangvigation.network.ApplicationController
+import com.mobal.hangvigation.network.NetworkService
 import kotlinx.android.synthetic.main.activity_summary.*
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
+import net.daum.mf.map.api.MapPolyline
 import net.daum.mf.map.api.MapView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import net.daum.mf.map.api.CameraUpdateFactory
+import net.daum.mf.map.api.MapPointBounds
 
-class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener {
+class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
     // idx별 건물
     // 0: 과학관, 1: 기계관, 2: 전자관, 3: 학관, 4: 도서관, 5: 창업보육센터 6: 항공우주박물관
     // 7: 강의동, 8: 본관, 9: 학군단, 10: 연구동, 11: 기숙사
@@ -26,10 +38,18 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     private lateinit var mapViewContainer : ViewGroup
     private lateinit var mapView : MapView
     private var markerIdx : Int = 0
+    private lateinit var networkService : NetworkService
+    private lateinit var polyline : MapPolyline
+    private var currentPoint : MapPoint? = null
+//    private var mRoute : ArrayList<PostOutdoorResponse> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_summary)
+
+
+
+        networkService = ApplicationController.instance.networkService
 
         markerIdx = intent.getIntExtra("MARKER_IDX", 0)
     }
@@ -39,7 +59,10 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
         floatingMap(markerPoints[markerIdx].mapPointGeoCoord.latitude, markerPoints[markerIdx].mapPointGeoCoord.longitude)
         floatingMarker(arrayOf(markerIdx), markerName[markerIdx])
-        setSummary(markerIdx)
+        // 현재 위치를 자동으로 설정
+        mapView.setCurrentLocationEventListener(this)
+        mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
+//        setSummary(markerIdx)
     }
 
     override fun onPause() {
@@ -79,17 +102,71 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         sv_horizon_summary.visibility = View.GONE
         tv_title_summary.text = markerName[idx]
 
-        /* TODO
-         * 소요시간, 도보로 이동할 거리 띄우기
-         * Tmap에서 경로 정보만 받아와서
-         * 맵 위에 polyline 그리기
-         */
+        // 현재 위치가 잡히면
+        if(currentPoint != null) {
+            Log.d("current","lat: "+ currentPoint!!.mapPointGeoCoord.latitude.toString()+", lon:"+currentPoint!!.mapPointGeoCoord.longitude)
+            networkOutdoorRoute(currentPoint!!.mapPointGeoCoord.latitude, currentPoint!!.mapPointGeoCoord.longitude)
+        }
+//        else {
+//            networkOutdoorRoute(37.60161074286123, 126.86512165734828)
+//        }
+
+
         // 안내 시작 버튼
-//        btn_start_summary.setOnClickListener {
+        btn_start_summary.setOnClickListener {
 //            Intent(this, OutNavi::class.java).let {
 //                startActivity(it)
 //            }
-//        }
+        }
+    }
+
+    /* 통신 */
+    private fun networkOutdoorRoute(x: Double, y: Double) {
+        val postOutdoor = networkService.postOutdoor(
+            PostOutdoorData(x, y,
+                markerPoints[markerIdx].mapPointGeoCoord.latitude,
+                markerPoints[markerIdx].mapPointGeoCoord.longitude
+                )
+        )
+
+        postOutdoor.enqueue(object : Callback<PostOutdoorResponse> {
+            override fun onFailure(call: Call<PostOutdoorResponse>?, t: Throwable?) {
+                Log.d("OUTDOOR_FAIL", t.toString())
+            }
+
+            override fun onResponse(call: Call<PostOutdoorResponse>?, response: Response<PostOutdoorResponse>?) {
+                if(response!!.isSuccessful){
+
+                    val data = response.body().data
+                    var totalTime = data[data.size - 1].y
+                    var totalDistance = data[data.size - 1].x
+                    Log.d("tag", totalDistance.toString())
+
+                    // 소요시간, 거리 띄우기
+                    tv_time_summary.text = "${totalTime.toInt()}분"
+                    tv_distance_summary.text = "${totalDistance.toInt()}m"
+
+                    // 경로 그리기
+                    polyline.tag = 1000
+                    polyline.lineColor = Color.parseColor("#ff6a6a")
+                    data.forEach {
+                        // 좌표가 겹치는게 있어서 걸러줘야함
+                        if(it.type == "Point") {
+                            polyline.addPoint(MapPoint.mapPointWithGeoCoord(it.y, it.x))
+                        }
+                    }
+
+                    mapView.addPolyline(polyline)
+                    val mapPointBounds = MapPointBounds(polyline.mapPoints)
+                    val padding = 100 // px
+                    mapView.moveCamera(CameraUpdateFactory.newMapPointBounds(mapPointBounds, padding))
+
+
+                } else{
+                    Log.d("OUTDOOR_UNSUCCESSFUL", response.message())
+                }
+            }
+        })
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
@@ -102,10 +179,23 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?,p1: MapPOIItem?,p2: MapPOIItem.CalloutBalloonButtonType?) {
     }
-
     override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
     }
-
     override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
+    }
+
+    /* 현재 위치 관련 메서드들 */
+    override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
+        currentPoint = p1!!
+        setSummary(markerIdx)
+//        Log.d("current","lat: "+currentPoint.mapPointGeoCoord.latitude.toString()+", lon:"+currentPoint.mapPointGeoCoord.longitude)
+    }
+    override fun onCurrentLocationUpdateCancelled(p0: MapView?) {
+        Log.d("current", "cancel")
+    }
+    override fun onCurrentLocationDeviceHeadingUpdate(p0: MapView?, p1: Float) {
+    }
+    override fun onCurrentLocationUpdateFailed(p0: MapView?) {
+        Log.d("current", "fail")
     }
 }

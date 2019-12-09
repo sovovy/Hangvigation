@@ -246,8 +246,3 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
         const val REQUEST_ACCESS_FINE_LOCATION = 10 // code you want.
     }
 }
-/* TODO
-     * 마커들 클래스로 묶을 수 있으면 묶기
-     * 현재 위치 버튼 -> 화면이 고정될 수 있도록
-     * (참고) api 메서드 사용: https://github.com/sesna99/BusComplain2/blob/d85ab8fff00b1f8b0c34d92b39cb85705f8ab3cc/app/src/main/java/trycatch/dev/buscomplain/View/Activity/SearchDetailActivity.kt
-*/
