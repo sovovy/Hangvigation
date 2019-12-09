@@ -307,7 +307,7 @@
                 android:textColor="#ffffff"
                 android:lineSpacingExtra="8sp"
                 android:fontFamily="@font/notosanskrlight"
-                android:text="메이커스페이스"
+                android:text="과사무실"
                 android:includeFontPadding="false"
                 app:layout_constraintTop_toBottomOf="@+id/tv_hot_search"
                 android:layout_marginTop="19dp"
