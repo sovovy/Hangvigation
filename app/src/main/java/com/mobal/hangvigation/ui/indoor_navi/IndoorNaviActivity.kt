@@ -16,6 +16,7 @@ import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.view.View
 import com.mobal.hangvigation.R
 import com.mobal.hangvigation.model.*
 import com.mobal.hangvigation.network.ApplicationController
@@ -101,6 +102,15 @@ class IndoorNaviActivity : AppCompatActivity() {
             filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION)
             registerReceiver(mWifiScanReceiver, filter)
             wifiManager!!.startScan()
+        }
+        // floor button visibility
+        intent.getIntegerArrayListExtra("FLOOR_ARR").forEach {
+            when(it) {
+                1 -> fl_1.visibility = View.VISIBLE
+                2 -> fl_2.visibility = View.VISIBLE
+                3 -> fl_3.visibility = View.VISIBLE
+                4 -> fl_4.visibility = View.VISIBLE
+            }
         }
 
         // 네트워크

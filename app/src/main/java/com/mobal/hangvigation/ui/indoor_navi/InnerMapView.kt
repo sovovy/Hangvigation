@@ -17,10 +17,12 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
     private var thread: Thread? = null
     var x: Int = 0
     var y: Int = 0
+    var z: Int = 0
     private var prevX : Int = 0
     private var prevY : Int = 0
     var destX = 17
     var destY = 33
+    var destZ = 3
     var responseCoord: Response<PostCoordResponse>? = null
     var route = FloatArray(0)
 
@@ -57,40 +59,35 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
         }
     }
 
-    fun a(n:Int): Float{
-        return (n*40).toFloat()
-    }
     private fun drawCircle(c: Canvas) {
         // 현재 위치
-        Paint().also {
-            it.style = Paint.Style.FILL
-            it.color = Color.parseColor("#FF6A6A")
-            try {
-                val tmpY = coordToDp(105 - responseCoord!!.body().data.y)
-                if (responseCoord!=null && (abs(prevY-tmpY)<=10 || prevX==0)) {
-                    x = coordToDp(responseCoord!!.body().data.x)
-                    y = coordToDp(105 - responseCoord!!.body().data.y)
-                    c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
+        if (x!=0 && y!= 0) {
+            Paint().also {
+                it.style = Paint.Style.FILL
+                it.color = Color.parseColor("#FF6A6A")
+                try {
+                    val tmpY = coordToDp(105 - responseCoord!!.body().data.y)
+                    if (responseCoord != null && (abs(prevY - tmpY) <= 10 || prevX == 0)) {
+                        x = coordToDp(responseCoord!!.body().data.x)
+                        y = coordToDp(105 - responseCoord!!.body().data.y)
+                        c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
 
-                    prevX = x
-                    prevY = y
-
-                    // test
-//                    x = coordToDp(17)
-//                    y = coordToDp(105 - 17)
-//                    c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
-                    //
+                        prevX = x
+                        prevY = y
+                    }
+                } catch (e: Exception) {
                 }
-            } catch (e: Exception) {
             }
         }
         // 목적지
-        Paint().also {
-            it.style = Paint.Style.FILL
-            it.color = Color.parseColor("#FFD35C")
-            try {
-                c.drawCircle(coordToDp(destX).toFloat(), coordToDp(105 - destY).toFloat(), 50f, it)
-            } catch (e: Exception) {
+        if (z == destZ) {
+            Paint().also {
+                it.style = Paint.Style.FILL
+                it.color = Color.parseColor("#FFD35C")
+                try {
+                    c.drawCircle(coordToDp(destX).toFloat(), coordToDp(105 - destY).toFloat(), 50f, it)
+                } catch (e: Exception) {
+                }
             }
         }
     }

@@ -34,7 +34,7 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         MapPoint.mapPointWithGeoCoord(37.598999067816706, 126.86420064147649), MapPoint.mapPointWithGeoCoord(37.59786575148311, 126.86588993989628),
         MapPoint.mapPointWithGeoCoord(37.59760323103674, 126.86480899679448), MapPoint.mapPointWithGeoCoord(37.59816840394317, 126.866614119594)
     )
-    private val markerName = arrayOf("과학관", "기계관", "전자관", "학관", "도서관", "창업보육센터", "항공우주박물관", "강의동", "본관", "학군단", "연구동", "기숙사")
+    private val markerName = arrayOf("과학관", "기계관", "전자관", "학생회관", "도서관", "창업보육센터", "항공우주박물관", "강의동", "본관", "학군단", "연구동", "기숙사")
     private lateinit var mapViewContainer : ViewGroup
     private lateinit var mapView : MapView
     private var markerIdx : Int = 0

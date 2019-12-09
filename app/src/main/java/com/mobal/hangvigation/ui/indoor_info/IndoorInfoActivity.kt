@@ -29,7 +29,7 @@ class IndoorInfoActivity : AppCompatActivity() {
     private lateinit var mapView : MapView
     private var placeIdx : Int = 1
     private var buildingIdx = hashMapOf(
-        Pair("과학관",0), Pair("기계관",1), Pair("전자관",2), Pair("학관",3),
+        Pair("과학관",0), Pair("기계관",1), Pair("전자관",2), Pair("학생회관",3),
         Pair("도서관",4), Pair("창업보육센터",5), Pair("항공우주박물관",6), Pair("강의동",7),
         Pair("본관",8), Pair("학군단",9), Pair("연구동",10), Pair("기숙사",11)
     )
@@ -66,6 +66,7 @@ class IndoorInfoActivity : AppCompatActivity() {
         marker.markerType = MapPOIItem.MarkerType.CustomImage
         marker.customImageResourceId = R.drawable.indoor_location
         marker.setCustomImageAnchor(0.5f, -1f)
+        marker.isShowCalloutBalloonOnTouch = false
         mapView.addPOIItem(marker)
     }
 
