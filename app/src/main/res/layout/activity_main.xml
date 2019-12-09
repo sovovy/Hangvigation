@@ -26,19 +26,27 @@
         app:layout_constraintBottom_toTopOf="@+id/cl_second_main"
     />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:textColor="#ffffff"
-        android:lineSpacingExtra="9sp"
-        android:text="항비게이션"
-        android:includeFontPadding="false"
-        android:fontFamily="@font/notosanskrbold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/view_top_main"
-        app:layout_constraintBottom_toBottomOf="@id/view_top_main"
+    <EditText
+            android:id="@+id/et_bar_search"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/view_top_main"
+            app:layout_constraintBottom_toBottomOf="@id/view_top_main"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="46dp"
+            android:background="@drawable/round_square_yellow"
+            android:backgroundTint="#ffffff"
+            android:textSize="15dp"
+            android:textColorHint="#9a9a9a"
+            android:lineSpacingExtra="7sp"
+            android:paddingStart="17dp"
+            android:paddingEnd="17dp"
+            android:maxLines="1"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:hint="장소를 검색해보세요"
     />
 
     <ImageView
@@ -49,6 +57,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/view_top_main"
         app:layout_constraintBottom_toBottomOf="@+id/view_top_main"
+        android:visibility="gone"
     />
 
     <ImageView
@@ -62,8 +71,17 @@
         app:layout_constraintBottom_toBottomOf="@+id/view_top_main"
         app:layout_constraintEnd_toEndOf="parent"
     />
-
-
+    <ImageView
+            android:id="@+id/iv_cancel_search"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/cancel"
+            android:layout_marginEnd="14dp"
+            app:layout_constraintTop_toTopOf="@+id/view_top_main"
+            app:layout_constraintBottom_toBottomOf="@+id/view_top_main"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
+    />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/cl_second_main"
@@ -141,64 +159,43 @@
         />
     </android.support.constraint.ConstraintLayout>
 
+    <ImageButton
+            android:id="@+id/btn_location_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/mlocation"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="15dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageButton
+            android:id="@+id/btn_school_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/school_location"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="15dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btn_location_main"/>
 
     <android.support.constraint.ConstraintLayout
             android:id="@+id/cl_search_main"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/view_top_main"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:visibility="gone"
     >
-
-        <View
-                android:id="@+id/view_top_search"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@color/colorPrimary"
-                app:layout_constraintTop_toTopOf="parent"
-        />
-
-        <EditText
-                android:id="@+id/et_bar_search"
-                android:layout_width="0dp"
-                android:layout_height="30dp"
-                app:layout_constraintTop_toTopOf="@+id/view_top_search"
-                app:layout_constraintBottom_toBottomOf="@+id/view_top_search"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/iv_cancel_search"
-                android:layout_marginStart="16dp"
-                android:background="@drawable/round_square_yellow"
-                android:backgroundTint="#ffffff"
-                android:textSize="15dp"
-                android:textColorHint="#9a9a9a"
-                android:lineSpacingExtra="7sp"
-                android:paddingStart="17dp"
-                android:paddingEnd="17dp"
-                android:maxLines="1"
-                android:inputType="text"
-                android:imeOptions="actionSearch"
-                android:hint="장소를 검색해보세요"
-        />
-
-        <ImageView
-                android:id="@+id/iv_cancel_search"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/cancel"
-                app:layout_constraintStart_toEndOf="@+id/et_bar_search"
-                android:layout_marginStart="6dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="12dp"
-                app:layout_constraintTop_toTopOf="@+id/view_top_search"
-                app:layout_constraintBottom_toBottomOf="@+id/view_top_search"
-        />
 
         <View
                 android:id="@+id/view_bottom_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/view_top_search"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:background="#cb000000"
         />
 
@@ -363,26 +360,4 @@
                 android:layout_marginStart="39dp"
         />
     </android.support.constraint.ConstraintLayout>
-
-    <ImageButton
-        android:id="@+id/btn_location_main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/mlocation"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="15dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageButton
-            android:id="@+id/btn_school_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/school_location"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="15dp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/btn_location_main"/>
 </android.support.constraint.ConstraintLayout>

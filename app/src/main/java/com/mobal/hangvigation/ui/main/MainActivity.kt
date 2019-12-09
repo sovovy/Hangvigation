@@ -19,6 +19,7 @@ import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.view.MotionEvent
 import com.mobal.hangvigation.R
 import com.mobal.hangvigation.ui.summary.OutdoorSummaryActivity
 
@@ -129,15 +130,29 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
             }
         }
 
+        et_bar_search.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                    cl_second_main.visibility = View.GONE
+                    cl_search_main.visibility = View.VISIBLE
+                    iv_search_main.visibility = View.GONE
+                    iv_cancel_search.visibility = View.VISIBLE
+            }
+            false
+        }
+
         // 검색 버튼 관련 VISIBILITY 관리
         iv_search_main.setOnClickListener {
             cl_second_main.visibility = View.GONE
             cl_search_main.visibility = View.VISIBLE
+            iv_search_main.visibility = View.GONE
+            iv_cancel_search.visibility = View.VISIBLE
         }
 
         iv_cancel_search.setOnClickListener {
             cl_second_main.visibility = View.VISIBLE
             cl_search_main.visibility = View.GONE
+            iv_search_main.visibility = View.VISIBLE
+            iv_cancel_search.visibility = View.GONE
         }
 
         // 검색어 공통 listener
