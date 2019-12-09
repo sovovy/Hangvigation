@@ -42,6 +42,7 @@
                 android:layout_alignParentEnd="true"
                 app:text="4층"
                 app:click="false"
+                android:visibility="gone"
         />
         <com.mobal.hangvigation.ui.indoor_navi.FloorButton
                 android:id="@+id/fl_3"
@@ -51,6 +52,7 @@
                 android:layout_below="@+id/fl_4"
                 app:text="3층"
                 app:click="false"
+                android:visibility="gone"
         />
         <com.mobal.hangvigation.ui.indoor_navi.FloorButton
                 android:id="@+id/fl_2"
@@ -60,6 +62,7 @@
                 android:layout_below="@+id/fl_3"
                 app:text="2층"
                 app:click="false"
+                android:visibility="gone"
         />
         <com.mobal.hangvigation.ui.indoor_navi.FloorButton
                 android:id="@+id/fl_1"
@@ -69,6 +72,7 @@
                 android:layout_below="@+id/fl_2"
                 app:text="1층"
                 app:click="false"
+                android:visibility="gone"
         />
     </RelativeLayout>
 </RelativeLayout>

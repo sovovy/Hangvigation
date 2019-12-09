@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.activity_summary.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.abs
 import kotlin.math.pow
 
 class IndoorSummaryActivity : AppCompatActivity(){
@@ -39,6 +40,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
     lateinit var mapView : InnerMapView
     private var lastFloor = 0
     val mRoute = HashMap<Int, FloatArray>()
+    private var floorArr = arrayListOf<Int>()
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -136,7 +138,6 @@ class IndoorSummaryActivity : AppCompatActivity(){
 
             override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
                 if(response!!.isSuccessful){
-                    // TODO 거리 구하기. 계단은 3m
                     val data = response.body().data
                     var prevX = data[0].x
                     var prevY = data[0].y
@@ -144,19 +145,31 @@ class IndoorSummaryActivity : AppCompatActivity(){
                     var len = 0.0
                     data.forEach {
                         len += if (prevZ!=it.z)
-                            3.0
+                            3.0 * abs(prevZ - it.z)
                         else
                             ((prevX - it.x).toDouble().pow(2) + (prevY - it.y).toDouble().pow(2)).pow(0.5)
 
                         prevX = it.x
                         prevY = it.y
                         prevZ = it.z
+                        // floor arr
+                        if (!floorArr.contains(it.z)) {
+                            floorArr.add(it.z)
+                            when(it.z) {
+                                1 -> fl_1_summary.visibility = View.VISIBLE
+                                2 -> fl_2_summary.visibility = View.VISIBLE
+                                3 -> fl_3_summary.visibility = View.VISIBLE
+                                4 -> fl_4_summary.visibility = View.VISIBLE
+                            }
+                        }
                     }
                     setTextUI(len)
                     setListener(data)
                     responseToRoute(data)
                     mapView.route = mRoute[lastFloor]?:mRoute[3]!!
-
+                    mapView.destX = data[data.size-1].x
+                    mapView.destY = data[data.size-1].y
+                    mapView.destZ = data[data.size-1].z
                 } else{
                     Log.d("ROUTE_UNSUCCESSFUL", response.message())
                 }
@@ -173,6 +186,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
         btn_start_summary.setOnClickListener {
             Intent(this, IndoorNaviActivity::class.java).let{
                 it.putExtra("ROUTE", route)
+                it.putExtra("FLOOR_ARR", floorArr)
                 startActivity(it)
                 finish()
             }
@@ -222,8 +236,8 @@ class IndoorSummaryActivity : AppCompatActivity(){
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
                 if (response!!.isSuccessful) {
                     mapView.responseCoord = response
-                    // TODO 서버에서 z축 값도 줘야함
-                    setRoute(response.body().data.x, response.body().data.y, 3)
+                    // TODO 테스트를 위해 주석해둠
+//                    setRoute(response.body().data.x, response.body().data.y, response.body().data.z)
                 } else {
                     Log.d("COORD_UNSUCCESSFUL", response.message())
                 }
