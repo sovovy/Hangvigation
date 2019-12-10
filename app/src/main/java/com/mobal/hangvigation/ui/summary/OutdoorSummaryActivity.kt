@@ -11,6 +11,7 @@ import com.mobal.hangvigation.R
 import com.mobal.hangvigation.model.*
 import com.mobal.hangvigation.network.ApplicationController
 import com.mobal.hangvigation.network.NetworkService
+import com.mobal.hangvigation.ui.outdoor_navi.OutdoorNaviActivity
 import kotlinx.android.synthetic.main.activity_summary.*
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
@@ -39,14 +40,14 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     private lateinit var mapView : MapView
     private var markerIdx : Int = 0
     private lateinit var networkService : NetworkService
-    private lateinit var polyline : MapPolyline
+    private var polyline = MapPolyline()
     private var currentPoint : MapPoint? = null
-//    private var mRoute : ArrayList<PostOutdoorResponse> = ArrayList()
+    private var pointLatitude = arrayListOf<Double>()
+    private var pointLongtitude = arrayListOf<Double>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_summary)
-
 
 
         networkService = ApplicationController.instance.networkService
@@ -59,10 +60,7 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
         floatingMap(markerPoints[markerIdx].mapPointGeoCoord.latitude, markerPoints[markerIdx].mapPointGeoCoord.longitude)
         floatingMarker(arrayOf(markerIdx), markerName[markerIdx])
-        // 현재 위치를 자동으로 설정
-        mapView.setCurrentLocationEventListener(this)
-        mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
-//        setSummary(markerIdx)
+
     }
 
     override fun onPause() {
@@ -75,6 +73,8 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(lat, long), 1, true)
         mapViewContainer = map_view_summary as ViewGroup
         mapViewContainer.addView(mapView)
+        mapView.setCurrentLocationEventListener(this)
+        mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
     }
 
     private fun floatingMarker(idxArr: Array<Int>, msg: String) {
@@ -104,8 +104,9 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
         // 현재 위치가 잡히면
         if(currentPoint != null) {
-            Log.d("current","lat: "+ currentPoint!!.mapPointGeoCoord.latitude.toString()+", lon:"+currentPoint!!.mapPointGeoCoord.longitude)
+            Log.d("summary_current","lat: "+ currentPoint!!.mapPointGeoCoord.latitude.toString()+", lon:"+currentPoint!!.mapPointGeoCoord.longitude)
             networkOutdoorRoute(currentPoint!!.mapPointGeoCoord.latitude, currentPoint!!.mapPointGeoCoord.longitude)
+            mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOff
         }
 //        else {
 //            networkOutdoorRoute(37.60161074286123, 126.86512165734828)
@@ -114,18 +115,21 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
         // 안내 시작 버튼
         btn_start_summary.setOnClickListener {
-//            Intent(this, OutNavi::class.java).let {
-//                startActivity(it)
-//            }
+            Intent(this, OutdoorNaviActivity::class.java).let {
+                it.putExtra("MARKER_IDX", markerIdx)
+//                it.putExtra("POINT_LATITUDE", pointLatitude)
+//                it.putExtra("POINT_LONGTITUDE", pointLongtitude)
+                startActivity(it)
+            }
         }
     }
 
     /* 통신 */
     private fun networkOutdoorRoute(x: Double, y: Double) {
         val postOutdoor = networkService.postOutdoor(
-            PostOutdoorData(x, y,
-                markerPoints[markerIdx].mapPointGeoCoord.latitude,
-                markerPoints[markerIdx].mapPointGeoCoord.longitude
+            PostOutdoorData(y, x,
+                markerPoints[markerIdx].mapPointGeoCoord.longitude,
+                markerPoints[markerIdx].mapPointGeoCoord.latitude
                 )
         )
 
@@ -140,33 +144,40 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
                     val data = response.body().data
                     var totalTime = data[data.size - 1].y
                     var totalDistance = data[data.size - 1].x
-                    Log.d("tag", totalDistance.toString())
 
                     // 소요시간, 거리 띄우기
                     tv_time_summary.text = "${totalTime.toInt()}분"
                     tv_distance_summary.text = "${totalDistance.toInt()}m"
 
                     // 경로 그리기
-                    polyline.tag = 1000
-                    polyline.lineColor = Color.parseColor("#ff6a6a")
-                    data.forEach {
-                        // 좌표가 겹치는게 있어서 걸러줘야함
-                        if(it.type == "Point") {
-                            polyline.addPoint(MapPoint.mapPointWithGeoCoord(it.y, it.x))
-                        }
-                    }
-
-                    mapView.addPolyline(polyline)
-                    val mapPointBounds = MapPointBounds(polyline.mapPoints)
-                    val padding = 100 // px
-                    mapView.moveCamera(CameraUpdateFactory.newMapPointBounds(mapPointBounds, padding))
-
+                    drawRoute(data)
 
                 } else{
                     Log.d("OUTDOOR_UNSUCCESSFUL", response.message())
                 }
             }
         })
+    }
+
+    private fun drawRoute(data: ArrayList<PostOutdoorResponseData>) {
+        // 경로 그리기
+        polyline.tag = 1000
+        polyline.lineColor = Color.parseColor("#ff6a6a")
+
+        data.forEach {
+            // 좌표가 겹치는게 있어서 걸러줘야함
+            if(!pointLatitude.contains(it.y) && it.type != "Properties") {
+                pointLatitude.add(it.y)
+                pointLongtitude.add(it.x)
+                polyline.addPoint(MapPoint.mapPointWithGeoCoord(it.y, it.x))
+            }
+        }
+
+        mapView.addPolyline(polyline)
+        // polyline 전체가 지도에 다 나오게 하기
+        val mapPointBounds = MapPointBounds(polyline.mapPoints)
+        val padding = 100 // px
+        mapView.moveCamera(CameraUpdateFactory.newMapPointBounds(mapPointBounds, padding))
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
