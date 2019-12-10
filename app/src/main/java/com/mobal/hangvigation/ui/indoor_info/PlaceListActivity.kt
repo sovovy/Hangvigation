@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_place_list.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.collections.ArrayList
 
 class PlaceListActivity : AppCompatActivity() {
     private var networkService : NetworkService = ApplicationController.instance.networkService
@@ -70,6 +71,7 @@ class PlaceListActivity : AppCompatActivity() {
         rv_top_division.adapter = divisionAdapter
     }
     private fun setRecyclerPlace() {
+        divisionOrPlaceItems.sort()
         placeAdapter = PlaceAdapter(this, divisionOrPlaceItems)
         rv_place_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rv_place_list.adapter = placeAdapter
