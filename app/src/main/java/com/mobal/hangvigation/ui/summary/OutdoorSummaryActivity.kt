@@ -40,10 +40,8 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     private lateinit var mapView : MapView
     private var markerIdx : Int = 0
     private lateinit var networkService : NetworkService
-    private var polyline = MapPolyline()
     private var currentPoint : MapPoint? = null
     private var pointLatitude = arrayListOf<Double>()
-    private var pointLongtitude = arrayListOf<Double>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,21 +102,16 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
         // 현재 위치가 잡히면
         if(currentPoint != null) {
-            Log.d("summary_current","lat: "+ currentPoint!!.mapPointGeoCoord.latitude.toString()+", lon:"+currentPoint!!.mapPointGeoCoord.longitude)
+            pointLatitude.clear()
             networkOutdoorRoute(currentPoint!!.mapPointGeoCoord.latitude, currentPoint!!.mapPointGeoCoord.longitude)
             mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOff
         }
-//        else {
-//            networkOutdoorRoute(37.60161074286123, 126.86512165734828)
-//        }
 
 
         // 안내 시작 버튼
         btn_start_summary.setOnClickListener {
             Intent(this, OutdoorNaviActivity::class.java).let {
                 it.putExtra("MARKER_IDX", markerIdx)
-//                it.putExtra("POINT_LATITUDE", pointLatitude)
-//                it.putExtra("POINT_LONGTITUDE", pointLongtitude)
                 startActivity(it)
             }
         }
@@ -160,15 +153,14 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     }
 
     private fun drawRoute(data: ArrayList<PostOutdoorResponseData>) {
-        // 경로 그리기
-        polyline.tag = 1000
+
+        var polyline = MapPolyline()
         polyline.lineColor = Color.parseColor("#ff6a6a")
 
         data.forEach {
             // 좌표가 겹치는게 있어서 걸러줘야함
             if(!pointLatitude.contains(it.y) && it.type != "Properties") {
                 pointLatitude.add(it.y)
-                pointLongtitude.add(it.x)
                 polyline.addPoint(MapPoint.mapPointWithGeoCoord(it.y, it.x))
             }
         }
@@ -199,7 +191,6 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
         currentPoint = p1!!
         setSummary(markerIdx)
-//        Log.d("current","lat: "+currentPoint.mapPointGeoCoord.latitude.toString()+", lon:"+currentPoint.mapPointGeoCoord.longitude)
     }
     override fun onCurrentLocationUpdateCancelled(p0: MapView?) {
         Log.d("current", "cancel")

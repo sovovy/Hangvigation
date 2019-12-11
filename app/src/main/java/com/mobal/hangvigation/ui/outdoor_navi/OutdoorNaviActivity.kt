@@ -3,6 +3,7 @@ package com.mobal.hangvigation.ui.outdoor_navi
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Toast
@@ -18,8 +19,8 @@ import retrofit2.Response
 
 class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
     // idx별 건물
-    // 0: 과학관, 1: 기계관, 2: 전자관, 3: 학관, 4: 도서관, 5: 창업보육센터 6: 항공우주박물관
-    // 7: 강의동, 8: 본관, 9: 학군단, 10: 연구동, 11: 기숙사
+    // 0: 과학관, 1: 기계관, 2: 전자관, 3: 학관, 4: 도서관, 5: 창업보육센터
+    // 6: 항공우주박물관, 7: 강의동, 8: 본관, 9: 학군단, 10: 연구동, 11: 기숙사
     private val markerPoints: Array<MapPoint> = arrayOf(
         MapPoint.mapPointWithGeoCoord(37.60161074286123, 126.86512165734828),
         MapPoint.mapPointWithGeoCoord(37.601213581669576, 126.86448821597422),
@@ -36,16 +37,28 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
     )
     private val markerName =
         arrayOf("과학관", "기계관", "전자관", "학생회관", "도서관", "창업보육센터", "항공우주박물관", "강의동", "본관", "학군단", "연구동", "기숙사")
+    private val markerImgs: Array<Int> = arrayOf(
+        R.drawable.marker_science,
+        R.drawable.marker_mechanical,
+        R.drawable.marker_electronic,
+        R.drawable.marker_student,
+        R.drawable.marker_library,
+        R.drawable.marker_venture,
+        R.drawable.marker_museum,
+        R.drawable.marker_lecture,
+        R.drawable.marker_main,
+        R.drawable.marker_rotc,
+        R.drawable.marker_research,
+        R.drawable.marker_residence
+    )
     private lateinit var mapViewContainer: ViewGroup
     private lateinit var mapView: MapView
     private var markerIdx: Int = 0
     private lateinit var networkService: NetworkService
-    private var polyline = MapPolyline()
     private var currentPoint: MapPoint? = null
     private var currentLat: Double = 0.0
     private var currentLon: Double = 0.0
     private var pointLat = arrayListOf<Double>()
-    private var pointLon = arrayListOf<Double>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +67,6 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
         networkService = ApplicationController.instance.networkService
 
         markerIdx = intent.getIntExtra("MARKER_IDX", 0)
-//        pointLat = intent.getSerializableExtra("POINT_LATITUDE") as ArrayList<Double>
-//        pointLon = intent.getSerializableExtra("POINT_LONGTITUDE") as ArrayList<Double>
     }
 
     override fun onResume() {
@@ -65,7 +76,7 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
             markerPoints[markerIdx].mapPointGeoCoord.latitude,
             markerPoints[markerIdx].mapPointGeoCoord.longitude
         )
-        floatingMarker(arrayOf(markerIdx), markerName[markerIdx])
+        floatingMarker(markerIdx, markerName[markerIdx])
 
         btn_guideEnd_outdoor.setOnClickListener {
             Toast.makeText(this@OutdoorNaviActivity, "안내를 종료합니다.", Toast.LENGTH_LONG).show()
@@ -89,43 +100,25 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
         mapViewContainer.addView(mapView)
         mapView.setCurrentLocationEventListener(this)
         mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
-
     }
 
-    private fun floatingMarker(idxArr: Array<Int>, msg: String) {
-        val markerImgs: Array<Int> = arrayOf(
-            R.drawable.marker_science,
-            R.drawable.marker_mechanical,
-            R.drawable.marker_electronic,
-            R.drawable.marker_student,
-            R.drawable.marker_library,
-            R.drawable.marker_venture,
-            R.drawable.marker_museum,
-            R.drawable.marker_lecture,
-            R.drawable.marker_main,
-            R.drawable.marker_rotc,
-            R.drawable.marker_research,
-            R.drawable.marker_residence
-        )
+    private fun floatingMarker(idx: Int, msg: String) {
 
         mapView.setPOIItemEventListener(this)
 
-        for (i in idxArr) {
-            val marker = MapPOIItem()
-            marker.isShowCalloutBalloonOnTouch = false
-            marker.itemName = msg
-            marker.tag = i
-            marker.mapPoint = markerPoints[i]
-            marker.markerType = MapPOIItem.MarkerType.CustomImage
-            marker.customImageResourceId = markerImgs[i]
-            marker.setCustomImageAnchor(0.5f, 0.5f)
-            mapView.addPOIItem(marker)
-        }
+        val marker = MapPOIItem()
+        marker.isShowCalloutBalloonOnTouch = false
+        marker.itemName = msg
+        marker.mapPoint = markerPoints[idx]
+        marker.markerType = MapPOIItem.MarkerType.CustomImage
+        marker.customImageResourceId = markerImgs[idx]
+        marker.setCustomImageAnchor(0.5f, 0.5f)
+        mapView.addPOIItem(marker)
     }
 
     private fun drawRoute(data: ArrayList<PostOutdoorResponseData>) {
 
-        polyline.tag = 1000
+        var polyline = MapPolyline()
         polyline.lineColor = Color.parseColor("#ff6a6a")
 
         data.forEach {
@@ -134,29 +127,26 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
                 polyline.addPoint(MapPoint.mapPointWithGeoCoord(it.y, it.x))
             }
         }
-
-//        for(i in pointLat.indices) {
-//            polyline.addPoint(MapPoint.mapPointWithGeoCoord(pointLat[i], pointLon[i]))
-//        }
-
         mapView.addPolyline(polyline)
     }
 
     /* 현재 위치 관련 메서드들 */
     override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
         currentPoint = p1!!
-        Log.d("navi_current",
-            "lat: " + currentPoint!!.mapPointGeoCoord.latitude +
-                ", lon:" + currentPoint!!.mapPointGeoCoord.longitude)
 
-        if(currentPoint != null) {
-            currentLat = currentPoint!!.mapPointGeoCoord.latitude
-            currentLon = currentPoint!!.mapPointGeoCoord.longitude
+        // 5초간 멈춤
+        val handler = Handler()
+        handler.postDelayed(
+            { if(currentPoint != null) {
+                currentLat = currentPoint!!.mapPointGeoCoord.latitude
+                currentLon = currentPoint!!.mapPointGeoCoord.longitude
 
-            mapView.moveCamera(CameraUpdateFactory.newMapPoint(currentPoint, (-2).toFloat()))
-            mapView.removeAllPolylines()
-            networkOutdoorRoute(currentLat, currentLon)
-        }
+                mapView.moveCamera(CameraUpdateFactory.newMapPoint(currentPoint, (-2).toFloat()))
+                pointLat.clear()
+                networkOutdoorRoute(currentLat, currentLon)
+            } },
+            1000
+        )
     }
 
     override fun onCurrentLocationUpdateCancelled(p0: MapView?) {
