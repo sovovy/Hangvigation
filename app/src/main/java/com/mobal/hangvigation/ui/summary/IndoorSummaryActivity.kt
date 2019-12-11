@@ -125,11 +125,23 @@ class IndoorSummaryActivity : AppCompatActivity(){
     }
 
     private fun networkRoute(x: Int, y: Int, z: Int) {
-        val postRoute = networkService.postRoute(PostRouteData(x, y, z,
+        var postRoute: Call<PostRouteResponse>
+        if (x==0 && y==0) {
+            postRoute = networkService.postRoute(PostRouteData(18, 2, 1,
                 intent.getIntExtra("X", 18),
                 intent.getIntExtra("Y", 33),
                 intent.getIntExtra("Z", 3))
-        )
+            )
+        } else {
+            postRoute = networkService.postRoute(
+                PostRouteData(
+                    x, y, z,
+                    intent.getIntExtra("X", 18),
+                    intent.getIntExtra("Y", 33),
+                    intent.getIntExtra("Z", 3)
+                )
+            )
+        }
 
         postRoute.enqueue(object : Callback<PostRouteResponse> {
             override fun onFailure(call: Call<PostRouteResponse>?, t: Throwable?) {
