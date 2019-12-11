@@ -36,9 +36,25 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         MapPoint.mapPointWithGeoCoord(37.59760323103674, 126.86480899679448), MapPoint.mapPointWithGeoCoord(37.59816840394317, 126.866614119594)
     )
     private val markerName = arrayOf("과학관", "기계관", "전자관", "학생회관", "도서관", "창업보육센터", "항공우주박물관", "강의동", "본관", "학군단", "연구동", "기숙사")
+    private val markerImgs: Array<Int> = arrayOf(
+        R.drawable.marker_science,
+        R.drawable.marker_mechanical,
+        R.drawable.marker_electronic,
+        R.drawable.marker_student,
+        R.drawable.marker_library,
+        R.drawable.marker_venture,
+        R.drawable.marker_museum,
+        R.drawable.marker_lecture,
+        R.drawable.marker_main,
+        R.drawable.marker_rotc,
+        R.drawable.marker_research,
+        R.drawable.marker_residence
+    )
     private lateinit var mapViewContainer : ViewGroup
     private lateinit var mapView : MapView
     private var markerIdx : Int = 0
+    private var markerStart : Int = 0
+    private var markerDest : Int = 0
     private lateinit var networkService : NetworkService
     private var currentPoint : MapPoint? = null
     private var pointLatitude = arrayListOf<Double>()
@@ -53,15 +69,25 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
         networkService = ApplicationController.instance.networkService
 
-        /* Main에서 받은 intent 관리 */
-        markerIdx = intent.getIntExtra("MARKER_IDX", 0)
 
         /* IndoorSummary에서 받은 intent 관리 */
-        if(intent.hasExtra("X")) {
+        // 실내->실외
+        if(intent.hasExtra("BUILDING_START")) {
+            markerStart = intent.getIntExtra("BUILDING_START", 0)
+            markerDest = intent.getIntExtra("BUILDING_DEST", 0)
+        }
+        // 실외->실내
+        else if(intent.hasExtra("BUILDING")){
             markerIdx = intent.getIntExtra("BUILDING", 0)
-            destinationX = intent.getIntExtra("X", 0)
-            destinationY = intent.getIntExtra("Y", 0)
-            destinationZ = intent.getIntExtra("Z", 0)
+        }
+        // Main에서 받은 intent
+        else {
+            markerIdx = intent.getIntExtra("MARKER_IDX", 0)
+        }
+        destinationX = intent.getIntExtra("X", 0)
+        destinationY = intent.getIntExtra("Y", 0)
+        destinationZ = intent.getIntExtra("Z", 0)
+        if(intent.hasExtra("ROUTE")) {
             mRoute = intent.getParcelableArrayListExtra("ROUTE")
         }
     }
@@ -70,8 +96,13 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         super.onResume()
 
         floatingMap(markerPoints[markerIdx].mapPointGeoCoord.latitude, markerPoints[markerIdx].mapPointGeoCoord.longitude)
-        floatingMarker(arrayOf(markerIdx), markerName[markerIdx])
 
+        if(intent.hasExtra("BUILDING_START")) {
+            floatingMarker(markerStart, markerName[markerStart])
+            floatingMarker(markerDest, markerName[markerDest])
+        } else {
+            floatingMarker(markerIdx, markerName[markerIdx])
+        }
     }
 
     override fun onPause() {
@@ -88,24 +119,18 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
     }
 
-    private fun floatingMarker(idxArr: Array<Int>, msg: String) {
-        val markerImgs: Array<Int> = arrayOf(R.drawable.marker_science, R.drawable.marker_mechanical, R.drawable.marker_electronic, R.drawable.marker_student,
-            R.drawable.marker_library, R.drawable.marker_venture, R.drawable.marker_museum, R.drawable.marker_lecture, R.drawable.marker_main, R.drawable.marker_rotc,
-            R.drawable.marker_research, R.drawable.marker_residence)
+    private fun floatingMarker(idx: Int, msg: String) {
 
         mapView.setPOIItemEventListener(this)
 
-        for (i in idxArr) {
-            val marker = MapPOIItem()
-            marker.isShowCalloutBalloonOnTouch = false
-            marker.itemName = msg
-            marker.tag = i
-            marker.mapPoint = markerPoints[i]
-            marker.markerType = MapPOIItem.MarkerType.CustomImage
-            marker.customImageResourceId = markerImgs[i]
-            marker.setCustomImageAnchor(0.5f, 0.5f)
-            mapView.addPOIItem(marker)
-        }
+        val marker = MapPOIItem()
+        marker.isShowCalloutBalloonOnTouch = false
+        marker.itemName = msg
+        marker.mapPoint = markerPoints[idx]
+        marker.markerType = MapPOIItem.MarkerType.CustomImage
+        marker.customImageResourceId = markerImgs[idx]
+        marker.setCustomImageAnchor(0.5f, 0.5f)
+        mapView.addPOIItem(marker)
     }
 
     private fun setSummary(idx: Int) {
@@ -113,7 +138,7 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         sv_horizon_summary.visibility = View.GONE
         tv_title_summary.text = markerName[idx]
 
-        // 현재 위치가 잡히면
+        // 현재 위치가 잡히면 통신
         if(currentPoint != null) {
             pointLatitude.clear()
             networkOutdoorRoute(currentPoint!!.mapPointGeoCoord.latitude, currentPoint!!.mapPointGeoCoord.longitude)
@@ -149,7 +174,6 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
             override fun onResponse(call: Call<PostOutdoorResponse>?, response: Response<PostOutdoorResponse>?) {
                 if(response!!.isSuccessful){
-
                     val data = response.body().data
                     var totalTime = data[data.size - 1].y
                     var totalDistance = data[data.size - 1].x
@@ -160,7 +184,6 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
 
                     // 경로 그리기
                     drawRoute(data)
-
                 } else{
                     Log.d("OUTDOOR_UNSUCCESSFUL", response.message())
                 }
@@ -200,6 +223,7 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
             it.putExtra("X", destinationX)
             it.putExtra("Y", destinationY)
             it.putExtra("Z", destinationZ)
+            it.putExtra("ROUTE", mRoute)
             startActivity(it)
         }
     }
