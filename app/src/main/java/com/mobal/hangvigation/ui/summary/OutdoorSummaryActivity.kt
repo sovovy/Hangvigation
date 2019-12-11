@@ -42,15 +42,28 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     private lateinit var networkService : NetworkService
     private var currentPoint : MapPoint? = null
     private var pointLatitude = arrayListOf<Double>()
+    private var destinationX : Int = 0
+    private var destinationY : Int = 0
+    private var destinationZ : Int = 0
+    private var mRoute = ArrayList<PostRouteResponseData>() // (건물1층 -> 실내목적지) 경로
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_summary)
 
-
         networkService = ApplicationController.instance.networkService
 
+        /* Main에서 받은 intent 관리 */
         markerIdx = intent.getIntExtra("MARKER_IDX", 0)
+
+        /* IndoorSummary에서 받은 intent 관리 */
+        if(intent.hasExtra("X")) {
+            markerIdx = intent.getIntExtra("BUILDING", 0)
+            destinationX = intent.getIntExtra("X", 0)
+            destinationY = intent.getIntExtra("Y", 0)
+            destinationZ = intent.getIntExtra("Z", 0)
+            mRoute = intent.getParcelableArrayListExtra("ROUTE")
+        }
     }
 
     override fun onResume() {
@@ -112,6 +125,9 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         btn_start_summary.setOnClickListener {
             Intent(this, OutdoorNaviActivity::class.java).let {
                 it.putExtra("MARKER_IDX", markerIdx)
+                if(mRoute != null) {
+                    it.putExtra("ROUTE", mRoute)
+                }
                 startActivity(it)
             }
         }
@@ -173,11 +189,19 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
-        // summary 일 땐 실내로 들어가는 경우에만 indoor map 으로 변환
 
-        // TODO indoor map 으로 변환
+        // outnavi, indoor info일 땐 do nothing
+        if(destinationX == 0) {
+            return
+        }
 
-        // outnavi, indoor info일 땐 do nothing (일단
+        // 마커 터치하면 IndoorSummary로 이동
+        Intent(this, IndoorSummaryActivity::class.java).let {
+            it.putExtra("X", destinationX)
+            it.putExtra("Y", destinationY)
+            it.putExtra("Z", destinationZ)
+            startActivity(it)
+        }
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?,p1: MapPOIItem?,p2: MapPOIItem.CalloutBalloonButtonType?) {
