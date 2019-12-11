@@ -2,6 +2,7 @@ package com.mobal.hangvigation.ui.indoor_info
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
@@ -14,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_place_list.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.collections.ArrayList
 
 class PlaceListActivity : AppCompatActivity() {
     private var networkService : NetworkService = ApplicationController.instance.networkService
@@ -66,10 +68,22 @@ class PlaceListActivity : AppCompatActivity() {
 
     private fun setRecyclerDivision() {
         divisionAdapter = DivisionAdapter(this, divisionOrPlaceItems)
-        rv_top_division.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        GridLayoutManager(this, 24).let {
+            it.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    val size = divisionOrPlaceItems[position].name!!.length
+                    return when {
+                        size>6 || size==4 -> size+1
+                        else -> size+2
+                    }
+                }
+            }
+            rv_top_division.layoutManager = it
+        }
         rv_top_division.adapter = divisionAdapter
     }
     private fun setRecyclerPlace() {
+        divisionOrPlaceItems.sort()
         placeAdapter = PlaceAdapter(this, divisionOrPlaceItems)
         rv_place_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rv_place_list.adapter = placeAdapter

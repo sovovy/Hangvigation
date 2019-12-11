@@ -59,6 +59,7 @@ class IndoorInfoActivity : AppCompatActivity() {
         mapViewContainer.addView(mapView)
 
         mapView.removeAllPOIItems()
+        mapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOff
         val marker = MapPOIItem()
         marker.itemName = name
         marker.tag = 1

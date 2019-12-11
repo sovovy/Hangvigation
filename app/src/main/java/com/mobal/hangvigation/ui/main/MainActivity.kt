@@ -72,6 +72,13 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
         mapViewContainer.removeView(mapView)
     }
 
+    override fun onBackPressed() {
+        if (iv_cancel_search.visibility == View.VISIBLE)
+            iv_cancel_search.performClick()
+        else
+            super.onBackPressed()
+    }
+
     private fun activeTrackingMode() {
         mapView.setShowCurrentLocationMarker(true)
         mapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.mlocation_circle,MapPOIItem.ImageOffset(32,32))

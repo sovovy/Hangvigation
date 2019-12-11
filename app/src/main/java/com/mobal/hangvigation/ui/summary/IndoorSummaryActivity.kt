@@ -145,7 +145,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
                     var len = 0.0
                     data.forEach {
                         len += if (prevZ!=it.z)
-                            3.0 * abs(prevZ - it.z)
+                            10.0 * abs(prevZ - it.z)
                         else
                             ((prevX - it.x).toDouble().pow(2) + (prevY - it.y).toDouble().pow(2)).pow(0.5)
 
