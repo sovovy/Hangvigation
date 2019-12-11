@@ -139,6 +139,19 @@ class IndoorSummaryActivity : AppCompatActivity(){
             override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
                 if(response!!.isSuccessful){
                     val data = response.body().data
+                    // 일치하는 좌표가 없는 경우 -> 실외
+                    if (x == 0 && y == 0) {
+                        Intent(this@IndoorSummaryActivity, OutdoorSummaryActivity::class.java).let {
+                            it.putExtra("BUILDING", 2)
+                            it.putExtra("X", intent.getIntExtra("X", 18))
+                            it.putExtra("Y", intent.getIntExtra("Y", 33))
+                            it.putExtra("Z", intent.getIntExtra("Z", 3))
+                            it.putExtra("ROUTE", data)
+                            startActivity(it)
+                            finish()
+                        }
+                    }
+
                     var prevX = data[0].x
                     var prevY = data[0].y
                     var prevZ = data[0].z

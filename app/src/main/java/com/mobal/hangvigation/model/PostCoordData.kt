@@ -12,5 +12,6 @@ data class PostCoordResponse(
 
 data class PostCoordResponseData(
     var x:Int,
-    var y:Int
+    var y:Int,
+    var z:Int
 )
