@@ -196,6 +196,7 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         var polyline = MapPolyline()
         polyline.lineColor = Color.parseColor("#ff6a6a")
 
+        polyline.addPoint(currentPoint)
         data.forEach {
             // 좌표가 겹치는게 있어서 걸러줘야함
             if(!pointLatitude.contains(it.y) && it.type != "Properties") {
@@ -203,7 +204,7 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
                 polyline.addPoint(MapPoint.mapPointWithGeoCoord(it.y, it.x))
             }
         }
-
+        polyline.addPoint(markerPoints[markerIdx])
         mapView.addPolyline(polyline)
         // polyline 전체가 지도에 다 나오게 하기
         val mapPointBounds = MapPointBounds(polyline.mapPoints)
@@ -238,6 +239,9 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
     /* 현재 위치 관련 메서드들 */
     override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
         currentPoint = p1!!
+        if (mapView.poiItems.isNotEmpty()) {
+            mapView.removeAllPolylines()
+        }
         setSummary(markerIdx)
     }
     override fun onCurrentLocationUpdateCancelled(p0: MapView?) {
