@@ -41,6 +41,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
     private var lastFloor = 0
     val mRoute = HashMap<Int, FloatArray>()
     private var floorArr = arrayListOf<Int>()
+    private val markerName = arrayOf("과학관", "기계관", "전자관", "학생회관", "도서관", "창업보육센터", "항공우주박물관", "강의동", "본관", "학군단", "연구동", "기숙사")
 
     private val mWifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -81,6 +82,15 @@ class IndoorSummaryActivity : AppCompatActivity(){
         map_view_summary.visibility = View.GONE
 
         val title = intent.getStringExtra("TITLE")?:"강의실"
+
+        if (intent.getStringExtra("BUILDING")!="전자관") {
+            Intent(this, OutdoorSummaryActivity::class.java).let {
+                it.putExtra("BUILDING_START", markerName.indexOf("전자관"))
+                it.putExtra("BUILDING_DEST", markerName.indexOf(intent.getStringExtra("BUILDING")))
+                startActivity(it)
+                finish()
+            }
+        }
 
         if (title.length > 13)
             tv_title_summary.text = title.slice(0..13)+"∙∙∙"

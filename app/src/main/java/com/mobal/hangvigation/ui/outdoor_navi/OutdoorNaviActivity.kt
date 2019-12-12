@@ -94,6 +94,7 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
 
     override fun onPause() {
         super.onPause()
+        mapView.removeAllPolylines()
         mapViewContainer.removeView(mapView)
     }
 

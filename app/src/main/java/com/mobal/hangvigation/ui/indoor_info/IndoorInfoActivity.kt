@@ -124,6 +124,7 @@ class IndoorInfoActivity : AppCompatActivity() {
         btn_guide_info.setOnClickListener {
             Intent(this, IndoorSummaryActivity::class.java).let {
                 it.putExtra("TITLE", data.name?: "${data.building} ${data.num}호")
+                it.putExtra("BUILDING", data.building)
                 it.putExtra("X", data.x)
                 it.putExtra("Y", data.y)
                 it.putExtra("Z", data.floor!![0].toString().toInt())

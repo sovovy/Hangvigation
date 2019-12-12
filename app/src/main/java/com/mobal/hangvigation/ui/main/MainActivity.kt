@@ -171,6 +171,7 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
         tv_hot2_search.setOnClickListener(searchListener)
         tv_hot3_search.setOnClickListener(searchListener)
         tv_hot4_search.setOnClickListener(searchListener)
+        tv_hot5_search.setOnClickListener(searchListener)
         tv_recent1_search.setOnClickListener(searchListener)
         tv_recent2_search.setOnClickListener(searchListener)
         tv_recent3_search.setOnClickListener(searchListener)

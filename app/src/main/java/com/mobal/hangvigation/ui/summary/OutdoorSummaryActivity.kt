@@ -75,6 +75,7 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
         if(intent.hasExtra("BUILDING_START")) {
             markerStart = intent.getIntExtra("BUILDING_START", 0)
             markerDest = intent.getIntExtra("BUILDING_DEST", 0)
+            markerIdx = intent.getIntExtra("BUILDING_DEST", 0)
         }
         // 실외->실내
         else if(intent.hasExtra("BUILDING")){
@@ -154,18 +155,27 @@ class OutdoorSummaryActivity : AppCompatActivity(), MapView.POIItemEventListener
                     it.putExtra("ROUTE", mRoute)
                 }
                 startActivity(it)
+                finish()
             }
         }
     }
 
     /* 통신 */
     private fun networkOutdoorRoute(x: Double, y: Double) {
-        val postOutdoor = networkService.postOutdoor(
+        var postOutdoor = networkService.postOutdoor(
             PostOutdoorData(y, x,
                 markerPoints[markerIdx].mapPointGeoCoord.longitude,
                 markerPoints[markerIdx].mapPointGeoCoord.latitude
-                )
+            )
         )
+        if (intent.hasExtra("BUILDING_DEST")) {
+            postOutdoor = networkService.postOutdoor(
+                PostOutdoorData(y, x,
+                    markerPoints[intent.getIntExtra("BUILDING_DEST", 0)].mapPointGeoCoord.longitude,
+                    markerPoints[intent.getIntExtra("BUILDING_DEST", 0)].mapPointGeoCoord.latitude
+                    )
+            )
+        }
 
         postOutdoor.enqueue(object : Callback<PostOutdoorResponse> {
             override fun onFailure(call: Call<PostOutdoorResponse>?, t: Throwable?) {

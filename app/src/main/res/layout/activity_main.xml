@@ -213,6 +213,7 @@
                 android:layout_marginTop="22dp"
                 app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
                 android:layout_marginStart="16dp"
+                android:visibility="gone"
         />
 
         <TextView
@@ -229,6 +230,7 @@
                 android:layout_marginTop="19dp"
                 app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
                 android:layout_marginStart="39dp"
+                android:visibility="gone"
         />
 
         <TextView
@@ -245,6 +247,7 @@
                 android:layout_marginTop="25dp"
                 app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
                 android:layout_marginStart="39dp"
+                android:visibility="gone"
         />
 
         <TextView
@@ -261,6 +264,7 @@
                 android:layout_marginTop="25dp"
                 app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
                 android:layout_marginStart="39dp"
+                android:visibility="gone"
         />
 
         <TextView
@@ -277,6 +281,7 @@
                 android:layout_marginTop="25dp"
                 app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
                 android:layout_marginStart="39dp"
+                android:visibility="gone"
         />
 
 
@@ -355,6 +360,22 @@
                 android:text="편의점"
                 android:includeFontPadding="false"
                 app:layout_constraintTop_toBottomOf="@+id/tv_hot3_search"
+                android:layout_marginTop="25dp"
+                app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
+                android:layout_marginStart="39dp"
+        />
+
+        <TextView
+                android:id="@+id/tv_hot5_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:textColor="#ffffff"
+                android:lineSpacingExtra="8sp"
+                android:fontFamily="@font/notosanskrlight"
+                android:text="카페"
+                android:includeFontPadding="false"
+                app:layout_constraintTop_toBottomOf="@+id/tv_hot4_search"
                 android:layout_marginTop="25dp"
                 app:layout_constraintStart_toStartOf="@+id/view_bottom_search"
                 android:layout_marginStart="39dp"
