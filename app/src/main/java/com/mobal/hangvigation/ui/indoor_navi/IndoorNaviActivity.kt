@@ -189,6 +189,7 @@ class IndoorNaviActivity : AppCompatActivity() {
         // set mapView route
         mapView.route = mRoute[route[0].z]?:mRoute[4]!!
 
+        Log.d("ASDFFF", "${route[0].z}")
         // current location's floor
         when (route[0].z) {
             1 -> fl_1.performClick()
@@ -209,7 +210,6 @@ class IndoorNaviActivity : AppCompatActivity() {
         // only first element puts once, others put twice
         tmpArr.add((res[0].x*40).toFloat())
         tmpArr.add(((105-res[0].y)*40).toFloat())
-        res.removeAt(0)
 
         res.forEach {
             if (tmpFloor!=it.z) {

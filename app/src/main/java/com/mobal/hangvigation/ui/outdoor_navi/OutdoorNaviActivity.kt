@@ -178,7 +178,8 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
         /* 현재 위치가 목적지랑 가까운 경우 */
         if(abs(currentLat - markerPoints[markerIdx].mapPointGeoCoord.latitude) <= 0.0002) {
             // IndoorSummary에서 Intent가 있는 경우 -> IndoorNavi로 이동
-            if(intent.hasExtra("ROUTE")) {
+
+            if(intent.getParcelableArrayListExtra<PostRouteResponseData>("ROUTE").size!=0) {
                 btn_guideEnd_outdoor.visibility = View.VISIBLE
                 btn_guideEnd_outdoor.text = "실내 길안내 시작"
                 btn_guideEnd_outdoor.setOnClickListener {
