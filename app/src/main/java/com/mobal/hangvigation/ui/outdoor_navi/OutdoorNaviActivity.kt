@@ -130,33 +130,39 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
         var polyline = MapPolyline()
         polyline.lineColor = Color.parseColor("#ff6a6a")
 
+        polyline.addPoint(currentPoint)
         data.forEach {
             if(!pointLat.contains(it.y) && it.type != "Properties") {
                 pointLat.add(it.y)
                 polyline.addPoint(MapPoint.mapPointWithGeoCoord(it.y, it.x))
             }
         }
+        polyline.addPoint(markerPoints[markerIdx])
         mapView.addPolyline(polyline)
     }
 
     /* 현재 위치 관련 메서드들 */
     override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
         currentPoint = p1!!
+        currentLat = currentPoint!!.mapPointGeoCoord.latitude
+        currentLon = currentPoint!!.mapPointGeoCoord.longitude
+        Log.d("currentPoint", "[$currentLat,  $currentLon]")
 
-        // 5초간 멈춤
-        val handler = Handler()
-        handler.postDelayed(
-            { if(currentPoint != null) {
-                currentLat = currentPoint!!.mapPointGeoCoord.latitude
-                currentLon = currentPoint!!.mapPointGeoCoord.longitude
-                Log.d("currentPoint", "[$currentLat,  $currentLon]")
+        if(mapView.poiItems.isNotEmpty()) {
+            mapView.moveCamera(CameraUpdateFactory.newMapPoint(currentPoint, (-2).toFloat()))
+            pointLat.clear()
+            mapView.removeAllPolylines()
 
-                mapView.moveCamera(CameraUpdateFactory.newMapPoint(currentPoint, (-2).toFloat()))
-                pointLat.clear()
+            // 5초간 멈춘다음에 다시 그리기
+            val handler = Handler()
+            handler.postDelayed({
                 networkOutdoorRoute(currentLat, currentLon)
-            } },
-            1000
-        )
+            }, 1000)
+        }
+        else {
+            networkOutdoorRoute(currentLat, currentLon)
+        }
+
 
         setListener()
     }
@@ -170,7 +176,7 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
 
     private fun setListener() {
         /* 현재 위치가 목적지랑 가까운 경우 */
-        if(abs(currentLat - markerPoints[markerIdx].mapPointGeoCoord.latitude) <= 0.0005) {
+        if(abs(currentLat - markerPoints[markerIdx].mapPointGeoCoord.latitude) <= 0.0002) {
             // IndoorSummary에서 Intent가 있는 경우 -> IndoorNavi로 이동
             if(intent.hasExtra("ROUTE")) {
                 btn_guideEnd_outdoor.visibility = View.VISIBLE
