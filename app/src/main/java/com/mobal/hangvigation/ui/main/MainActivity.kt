@@ -98,6 +98,7 @@ class MainActivity : AppCompatActivity(), MapView.POIItemEventListener {
 
     private fun floatingMap(lat: Double, long: Double) {
         mapView = MapView(this)
+        mapView.removeAllPolylines()
         mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(lat, long), 1, true)
         mapViewContainer = map_view_main as ViewGroup
         mapViewContainer.addView(mapView)
