@@ -170,7 +170,6 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
     private fun setListener() {
         /* 현재 위치가 목적지랑 가까운 경우 */
         if(abs(currentLat - markerPoints[markerIdx].mapPointGeoCoord.latitude) <= 0.0005) {
-
             // IndoorSummary에서 Intent가 있는 경우 -> IndoorNavi로 이동
             if(intent.hasExtra("ROUTE")) {
                 btn_guideEnd_outdoor.visibility = View.VISIBLE
