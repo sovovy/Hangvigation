@@ -1,21 +1,25 @@
 package com.mobal.hangvigation.ui.outdoor_navi
 
+import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.mobal.hangvigation.R
 import com.mobal.hangvigation.model.*
 import com.mobal.hangvigation.network.ApplicationController
 import com.mobal.hangvigation.network.NetworkService
+import com.mobal.hangvigation.ui.indoor_navi.IndoorNaviActivity
 import kotlinx.android.synthetic.main.activity_outdoor_navi.*
 import net.daum.mf.map.api.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Math.abs
 
 class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, MapView.CurrentLocationEventListener {
     // idx별 건물
@@ -59,6 +63,7 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
     private var currentLat: Double = 0.0
     private var currentLon: Double = 0.0
     private var pointLat = arrayListOf<Double>()
+    private var mRoute = ArrayList<PostRouteResponseData>() // (건물1층 -> 실내목적지) 경로
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +72,9 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
         networkService = ApplicationController.instance.networkService
 
         markerIdx = intent.getIntExtra("MARKER_IDX", 0)
+        if(intent.hasExtra("ROUTE")) {
+            mRoute = intent.getParcelableArrayListExtra("ROUTE")
+        }
     }
 
     override fun onResume() {
@@ -147,6 +155,8 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
             } },
             1000
         )
+
+        setListener()
     }
 
     override fun onCurrentLocationUpdateCancelled(p0: MapView?) {
@@ -156,6 +166,19 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
     override fun onCurrentLocationUpdateFailed(p0: MapView?) {
     }
 
+    private fun setListener() {
+        // 현재 위치가 목적지랑 가까운 경우 -> IndoorNavi로 이동
+        if(abs(currentLat - markerPoints[markerIdx].mapPointGeoCoord.latitude) <= 0.0005) {
+            btn_guideEnd_outdoor.visibility = View.VISIBLE
+            btn_guideEnd_outdoor.text = "실외 길안내 시작"
+            btn_guideEnd_outdoor.setOnClickListener {
+                Intent(this, IndoorNaviActivity::class.java).let {
+                    intent.putExtra("ROUTE", mRoute)
+                    startActivity(it)
+                }
+            }
+        }
+    }
 
     /* 통신 */
     private fun networkOutdoorRoute(x: Double, y: Double) {
