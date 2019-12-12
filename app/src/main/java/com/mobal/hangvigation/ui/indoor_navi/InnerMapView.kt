@@ -23,6 +23,7 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
     var destX = 17
     var destY = 33
     var destZ = 3
+    var selectedFloor = 4
     var responseCoord: Response<PostCoordResponse>? = null
     var route = FloatArray(0)
 
@@ -61,26 +62,28 @@ class InnerMapView(ctx: Context, var img: Bitmap, private val sv_vertical: Scrol
 
     private fun drawCircle(c: Canvas) {
         // 현재 위치
-        if (x!=0 && y!= 0) {
+        Log.d("ASDFMAPV", "$selectedFloor")
+        Log.d("ASDFMAPV", "$x $y $z")
+        if (x!=0 && y!= 0 && selectedFloor==z) {
             Paint().also {
                 it.style = Paint.Style.FILL
                 it.color = Color.parseColor("#FF6A6A")
                 try {
                     val tmpY = coordToDp(105 - responseCoord!!.body().data.y)
-                    if (responseCoord != null && (abs(prevY - tmpY) <= 10 || prevX == 0)) {
+//                    if (responseCoord != null && (abs(prevY - tmpY) <= 10 || prevX == 0)) {
                         x = coordToDp(responseCoord!!.body().data.x)
                         y = coordToDp(105 - responseCoord!!.body().data.y)
                         c.drawCircle(x.toFloat(), y.toFloat(), 30f, it)
 
                         prevX = x
                         prevY = y
-                    }
+//                    }
                 } catch (e: Exception) {
                 }
             }
         }
         // 목적지
-        if (z == destZ) {
+        if (selectedFloor == destZ) {
             Paint().also {
                 it.style = Paint.Style.FILL
                 it.color = Color.parseColor("#FFD35C")

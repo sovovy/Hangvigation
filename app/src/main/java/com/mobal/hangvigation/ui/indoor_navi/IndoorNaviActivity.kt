@@ -129,6 +129,7 @@ class IndoorNaviActivity : AppCompatActivity() {
             4 -> fl_4.changeBg()
         }
         lastFloor = f
+        mapView.selectedFloor = lastFloor
     }
 
     private fun changeMap(f: Int) {
@@ -164,6 +165,12 @@ class IndoorNaviActivity : AppCompatActivity() {
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
                 if (response!!.isSuccessful) {
                     mapView.responseCoord = response
+                    mapView.x = response.body().data.x
+                    mapView.y = response.body().data.y
+                    mapView.z = response.body().data.z
+                    mapView.destX = intent.getIntExtra("DEST_X", 18)
+                    mapView.destY = intent.getIntExtra("DEST_Y", 33)
+                    mapView.destZ = intent.getIntExtra("DEST_Z", 3)
                 } else {
                     Log.d("COORD_UNSUCCESSFUL", response.message())
                 }

@@ -96,8 +96,8 @@ class IndoorSummaryActivity : AppCompatActivity(){
         }
     }
 
-    private fun setRoute(x: Int, y: Int, z: Int) {
-        setMapView(z, x, y)
+    private fun setRoute(x: Int, y: Int, z: Int, response:Response<PostCoordResponse>) {
+        setMapView(z, x, y, response)
         when (z) {
             1 -> fl_1_summary.performClick()
             2 -> fl_2_summary.performClick()
@@ -107,8 +107,9 @@ class IndoorSummaryActivity : AppCompatActivity(){
         networkRoute(x, y, z)
     }
 
-    private fun setMapView(initF: Int, x: Int, y: Int) {
-        var tmp = 3
+    private fun setMapView(initF: Int, x: Int, y: Int, response:Response<PostCoordResponse>) {
+        Log.d("ASDF", "$x $y $initF")
+        var tmp = R.drawable.f4
         when (initF) {
             1 -> tmp = R.drawable.f1
             2 -> tmp = R.drawable.f2
@@ -116,17 +117,14 @@ class IndoorSummaryActivity : AppCompatActivity(){
             4 -> tmp = R.drawable.f4
         }
         mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, tmp), sv_vertical_summary)
-        mapView.x = x
-        mapView.y = y
-        mapView.z = initF
+        mapView.responseCoord = response
         prt_summary.addView(mapView)
     }
 
     private fun networkRoute(x: Int, y: Int, z: Int) {
         Log.d("ASDF", "$x $y $z")
         if (x==0 && y==0) {
-            // TODO 1층 그래프 넣으면 3층 -> 1층 변경
-            val postRoute = networkService.postRoute(PostRouteData(18, 2, 3,
+            val postRoute = networkService.postRoute(PostRouteData(18, 2, 1,
                 intent.getIntExtra("X", 18),
                 intent.getIntExtra("Y", 33),
                 intent.getIntExtra("Z", 3))
@@ -138,21 +136,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
 
                 override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
                     if(response!!.isSuccessful){
-//                    val data = response.body().data
-                        val data = arrayListOf(
-                            PostRouteResponseData(18,5,4),
-                            PostRouteResponseData(18,74,4),
-                            PostRouteResponseData(9,74,4),
-                            PostRouteResponseData(18,5,3),
-                            PostRouteResponseData(18,74,3),
-                            PostRouteResponseData(9,74,3),
-                            PostRouteResponseData(18,5,2),
-                            PostRouteResponseData(18,74,2),
-                            PostRouteResponseData(9,74,2),
-                            PostRouteResponseData(18,5,1),
-                            PostRouteResponseData(18,74,1),
-                            PostRouteResponseData(9,74,1)
-                        )
+                    val data = response.body().data
 
                         Intent(this@IndoorSummaryActivity, OutdoorSummaryActivity::class.java).let {
                             it.putExtra("BUILDING", 2)
@@ -184,21 +168,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
 
                 override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
                     if(response!!.isSuccessful){
-//                    val data = response.body().data
-                        val data = arrayListOf(
-                            PostRouteResponseData(18,5,4),
-                            PostRouteResponseData(18,74,4),
-                            PostRouteResponseData(9,74,4),
-                            PostRouteResponseData(18,5,3),
-                            PostRouteResponseData(18,74,3),
-                            PostRouteResponseData(9,74,3),
-                            PostRouteResponseData(18,5,2),
-                            PostRouteResponseData(18,74,2),
-                            PostRouteResponseData(9,74,2),
-                            PostRouteResponseData(18,5,1),
-                            PostRouteResponseData(18,74,1),
-                            PostRouteResponseData(9,74,1)
-                        )
+                        val data = response.body().data
 
                         var prevX = data[0].x
                         var prevY = data[0].y
@@ -249,6 +219,9 @@ class IndoorSummaryActivity : AppCompatActivity(){
             Intent(this, IndoorNaviActivity::class.java).let{
                 it.putExtra("ROUTE", route)
                 it.putExtra("FLOOR_ARR", floorArr)
+                it.putExtra("DEST_X", intent.getIntExtra("X", 18))
+                it.putExtra("DEST_Y", intent.getIntExtra("Y", 33))
+                it.putExtra("DEST_Z", intent.getIntExtra("Z", 3))
                 startActivity(it)
                 finish()
             }
@@ -297,7 +270,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
 
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
                 if (response!!.isSuccessful) {
-                    setRoute(response.body().data.x, response.body().data.y, response.body().data.z)
+                    setRoute(response.body().data.x, response.body().data.y, response.body().data.z, response)
                 } else {
                     Log.d("COORD_UNSUCCESSFUL", response.message())
                 }
