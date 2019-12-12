@@ -65,9 +65,6 @@ class IndoorSummaryActivity : AppCompatActivity(){
         networkService = ApplicationController.instance.networkService
 
         init()
-
-        // TODO DELETE
-        setRoute(18, 5, 3)
     }
 
     override fun onStart() {
@@ -100,19 +97,17 @@ class IndoorSummaryActivity : AppCompatActivity(){
     }
 
     private fun setRoute(x: Int, y: Int, z: Int) {
-        setMapView(z, y)
+        setMapView(z, x, y)
         when (z) {
             1 -> fl_1_summary.performClick()
             2 -> fl_2_summary.performClick()
             3 -> fl_3_summary.performClick()
             4 -> fl_4_summary.performClick()
         }
-        // TODO change
-//        networkRoute(x, y, z)
-        networkRoute(18, 5, 3)
+        networkRoute(x, y, z)
     }
 
-    private fun setMapView(initF: Int, y: Int) {
+    private fun setMapView(initF: Int, x: Int, y: Int) {
         var tmp = 3
         when (initF) {
             1 -> tmp = R.drawable.f1
@@ -121,38 +116,44 @@ class IndoorSummaryActivity : AppCompatActivity(){
             4 -> tmp = R.drawable.f4
         }
         mapView = InnerMapView(this, BitmapFactory.decodeResource(resources, tmp), sv_vertical_summary)
+        mapView.x = x
+        mapView.y = y
+        mapView.z = initF
         prt_summary.addView(mapView)
     }
 
     private fun networkRoute(x: Int, y: Int, z: Int) {
-        var postRoute: Call<PostRouteResponse>
+        Log.d("ASDF", "$x $y $z")
         if (x==0 && y==0) {
-            postRoute = networkService.postRoute(PostRouteData(18, 2, 1,
+            // TODO 1층 그래프 넣으면 3층 -> 1층 변경
+            val postRoute = networkService.postRoute(PostRouteData(18, 2, 3,
                 intent.getIntExtra("X", 18),
                 intent.getIntExtra("Y", 33),
                 intent.getIntExtra("Z", 3))
             )
-        } else {
-            postRoute = networkService.postRoute(
-                PostRouteData(
-                    x, y, z,
-                    intent.getIntExtra("X", 18),
-                    intent.getIntExtra("Y", 33),
-                    intent.getIntExtra("Z", 3)
-                )
-            )
-        }
+            postRoute.enqueue(object : Callback<PostRouteResponse> {
+                override fun onFailure(call: Call<PostRouteResponse>?, t: Throwable?) {
+                    Log.d("ROUTE_FAIL", t.toString())
+                }
 
-        postRoute.enqueue(object : Callback<PostRouteResponse> {
-            override fun onFailure(call: Call<PostRouteResponse>?, t: Throwable?) {
-                Log.d("ROUTE_FAIL", t.toString())
-            }
+                override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
+                    if(response!!.isSuccessful){
+//                    val data = response.body().data
+                        val data = arrayListOf(
+                            PostRouteResponseData(18,5,4),
+                            PostRouteResponseData(18,74,4),
+                            PostRouteResponseData(9,74,4),
+                            PostRouteResponseData(18,5,3),
+                            PostRouteResponseData(18,74,3),
+                            PostRouteResponseData(9,74,3),
+                            PostRouteResponseData(18,5,2),
+                            PostRouteResponseData(18,74,2),
+                            PostRouteResponseData(9,74,2),
+                            PostRouteResponseData(18,5,1),
+                            PostRouteResponseData(18,74,1),
+                            PostRouteResponseData(9,74,1)
+                        )
 
-            override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
-                if(response!!.isSuccessful){
-                    val data = response.body().data
-                    // 일치하는 좌표가 없는 경우 -> 실외
-                    if (x == 0 && y == 0) {
                         Intent(this@IndoorSummaryActivity, OutdoorSummaryActivity::class.java).let {
                             it.putExtra("BUILDING", 2)
                             it.putExtra("X", intent.getIntExtra("X", 18))
@@ -162,44 +163,80 @@ class IndoorSummaryActivity : AppCompatActivity(){
                             startActivity(it)
                             finish()
                         }
+                    } else{
+                        Log.d("ROUTE_UNSUCCESSFUL", response.message())
                     }
+                }
+            })
+        } else {
+            val postRoute = networkService.postRoute(
+                PostRouteData(
+                    x, y, z,
+                    intent.getIntExtra("X", 18),
+                    intent.getIntExtra("Y", 33),
+                    intent.getIntExtra("Z", 3)
+                )
+            )
+            postRoute.enqueue(object : Callback<PostRouteResponse> {
+                override fun onFailure(call: Call<PostRouteResponse>?, t: Throwable?) {
+                    Log.d("ROUTE_FAIL", t.toString())
+                }
 
-                    var prevX = data[0].x
-                    var prevY = data[0].y
-                    var prevZ = data[0].z
-                    var len = 0.0
-                    data.forEach {
-                        len += if (prevZ!=it.z)
-                            10.0 * abs(prevZ - it.z)
-                        else
-                            ((prevX - it.x).toDouble().pow(2) + (prevY - it.y).toDouble().pow(2)).pow(0.5)
+                override fun onResponse(call: Call<PostRouteResponse>?, response: Response<PostRouteResponse>?) {
+                    if(response!!.isSuccessful){
+//                    val data = response.body().data
+                        val data = arrayListOf(
+                            PostRouteResponseData(18,5,4),
+                            PostRouteResponseData(18,74,4),
+                            PostRouteResponseData(9,74,4),
+                            PostRouteResponseData(18,5,3),
+                            PostRouteResponseData(18,74,3),
+                            PostRouteResponseData(9,74,3),
+                            PostRouteResponseData(18,5,2),
+                            PostRouteResponseData(18,74,2),
+                            PostRouteResponseData(9,74,2),
+                            PostRouteResponseData(18,5,1),
+                            PostRouteResponseData(18,74,1),
+                            PostRouteResponseData(9,74,1)
+                        )
 
-                        prevX = it.x
-                        prevY = it.y
-                        prevZ = it.z
-                        // floor arr
-                        if (!floorArr.contains(it.z)) {
-                            floorArr.add(it.z)
-                            when(it.z) {
-                                1 -> fl_1_summary.visibility = View.VISIBLE
-                                2 -> fl_2_summary.visibility = View.VISIBLE
-                                3 -> fl_3_summary.visibility = View.VISIBLE
-                                4 -> fl_4_summary.visibility = View.VISIBLE
+                        var prevX = data[0].x
+                        var prevY = data[0].y
+                        var prevZ = data[0].z
+                        var len = 0.0
+                        data.forEach {
+                            len += if (prevZ!=it.z)
+                                10.0 * abs(prevZ - it.z)
+                            else
+                                ((prevX - it.x).toDouble().pow(2) + (prevY - it.y).toDouble().pow(2)).pow(0.5)
+
+                            prevX = it.x
+                            prevY = it.y
+                            prevZ = it.z
+                            // floor arr
+                            if (!floorArr.contains(it.z)) {
+                                floorArr.add(it.z)
+                                when(it.z) {
+                                    1 -> fl_1_summary.visibility = View.VISIBLE
+                                    2 -> fl_2_summary.visibility = View.VISIBLE
+                                    3 -> fl_3_summary.visibility = View.VISIBLE
+                                    4 -> fl_4_summary.visibility = View.VISIBLE
+                                }
                             }
                         }
+                        setTextUI(len)
+                        setListener(data)
+                        responseToRoute(data)
+                        mapView.route = mRoute[lastFloor]?:mRoute[3]!!
+                        mapView.destX = data[data.size-1].x
+                        mapView.destY = data[data.size-1].y
+                        mapView.destZ = data[data.size-1].z
+                    } else{
+                        Log.d("ROUTE_UNSUCCESSFUL", response.message())
                     }
-                    setTextUI(len)
-                    setListener(data)
-                    responseToRoute(data)
-                    mapView.route = mRoute[lastFloor]?:mRoute[3]!!
-                    mapView.destX = data[data.size-1].x
-                    mapView.destY = data[data.size-1].y
-                    mapView.destZ = data[data.size-1].z
-                } else{
-                    Log.d("ROUTE_UNSUCCESSFUL", response.message())
                 }
-            }
-        })
+            })
+        }
     }
 
     private fun setTextUI(distance: Double) {
@@ -260,9 +297,7 @@ class IndoorSummaryActivity : AppCompatActivity(){
 
             override fun onResponse(call: Call<PostCoordResponse>?, response: Response<PostCoordResponse>?) {
                 if (response!!.isSuccessful) {
-                    mapView.responseCoord = response
-                    // TODO 테스트를 위해 주석해둠
-//                    setRoute(response.body().data.x, response.body().data.y, response.body().data.z)
+                    setRoute(response.body().data.x, response.body().data.y, response.body().data.z)
                 } else {
                     Log.d("COORD_UNSUCCESSFUL", response.message())
                 }

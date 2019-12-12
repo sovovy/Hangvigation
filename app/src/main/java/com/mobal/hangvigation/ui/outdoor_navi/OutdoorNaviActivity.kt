@@ -173,8 +173,16 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
             btn_guideEnd_outdoor.text = "실외 길안내 시작"
             btn_guideEnd_outdoor.setOnClickListener {
                 Intent(this, IndoorNaviActivity::class.java).let {
-                    intent.putExtra("ROUTE", mRoute)
+                    it.putExtra("ROUTE", mRoute)
+                    var floorArr = arrayListOf<Int>()
+                    mRoute.forEach {d ->
+                        if (!floorArr.contains(d.z)) {
+                            floorArr.add(d.z)
+                        }
+                    }
+                    it.putExtra("FLOOR_ARR", floorArr)
                     startActivity(it)
+                    finish()
                 }
             }
         }
