@@ -148,6 +148,7 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
             { if(currentPoint != null) {
                 currentLat = currentPoint!!.mapPointGeoCoord.latitude
                 currentLon = currentPoint!!.mapPointGeoCoord.longitude
+                Log.d("currentPoint", "[$currentLat,  $currentLon]")
 
                 mapView.moveCamera(CameraUpdateFactory.newMapPoint(currentPoint, (-2).toFloat()))
                 pointLat.clear()
@@ -167,14 +168,26 @@ class OutdoorNaviActivity : AppCompatActivity(), MapView.POIItemEventListener, M
     }
 
     private fun setListener() {
-        // 현재 위치가 목적지랑 가까운 경우 -> IndoorNavi로 이동
+        /* 현재 위치가 목적지랑 가까운 경우 */
         if(abs(currentLat - markerPoints[markerIdx].mapPointGeoCoord.latitude) <= 0.0005) {
-            btn_guideEnd_outdoor.visibility = View.VISIBLE
-            btn_guideEnd_outdoor.text = "실외 길안내 시작"
-            btn_guideEnd_outdoor.setOnClickListener {
-                Intent(this, IndoorNaviActivity::class.java).let {
-                    intent.putExtra("ROUTE", mRoute)
-                    startActivity(it)
+
+            // IndoorSummary에서 Intent가 있는 경우 -> IndoorNavi로 이동
+            if(intent.hasExtra("ROUTE")) {
+                btn_guideEnd_outdoor.visibility = View.VISIBLE
+                btn_guideEnd_outdoor.text = "실내 길안내 시작"
+                btn_guideEnd_outdoor.setOnClickListener {
+                    Intent(this, IndoorNaviActivity::class.java).let {
+                        it.putExtra("ROUTE", mRoute)
+                        startActivity(it)
+                    }
+                }
+            }
+            // just 실외길찾기에서 끝나는 경우
+            else {
+                btn_guideEnd_outdoor.visibility = View.VISIBLE
+                btn_guideEnd_outdoor.text = "안내 종료"
+                btn_guideEnd_outdoor.setOnClickListener {
+                    finish()
                 }
             }
         }
